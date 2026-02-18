@@ -1,0 +1,11 @@
+# Whisper models
+*.bin
+android/app/src/main/assets/models/
+
+# Android build
+android/.gradle/
+android/build/
+android/app/build/
+
+# Local properties
+android/local.properties
