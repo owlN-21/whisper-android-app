@@ -15,6 +15,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.whispercppdemo.media.decodeWaveFile
 import com.whispercppdemo.recorder.Recorder
+import com.whispercppdemo.logger.FileLogger
 import com.whispercpp.whisper.WhisperContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,6 +32,9 @@ class MainScreenViewModel(private val application: Application) : ViewModel() {
         private set
     var isRecording by mutableStateOf(false)
         private set
+    var transcribedText by mutableStateOf("")
+        private set
+
 
     private val modelsPath = File(application.filesDir, "models")
     private val samplesPath = File(application.filesDir, "samples")
@@ -38,6 +42,8 @@ class MainScreenViewModel(private val application: Application) : ViewModel() {
     private var whisperContext: com.whispercpp.whisper.WhisperContext? = null
     private var mediaPlayer: MediaPlayer? = null
     private var recordedFile: File? = null
+
+    private val logger = FileLogger(application)
 
     init {
         viewModelScope.launch {
@@ -62,8 +68,8 @@ class MainScreenViewModel(private val application: Application) : ViewModel() {
         }
     }
 
-    private suspend fun printMessage(msg: String) = withContext(Dispatchers.Main) {
-        dataLog += msg
+    private suspend fun printMessage(msg: String) {
+        logger.log(msg)
     }
 
     private suspend fun copyAssets() = withContext(Dispatchers.IO) {
@@ -142,10 +148,15 @@ class MainScreenViewModel(private val application: Application) : ViewModel() {
             val data = readAudioSamples(file)
             printMessage("${data.size / (16000 / 1000)} ms\n")
             printMessage("Transcribing data...\n")
+
             val start = System.currentTimeMillis()
             val text = whisperContext?.transcribeData(data)
             val elapsed = System.currentTimeMillis() - start
-            printMessage("Done ($elapsed ms): \n$text\n")
+            withContext(Dispatchers.Main) {
+                transcribedText = text ?: ""
+            }
+            printMessage("Done ($elapsed ms)")
+
         } catch (e: Exception) {
             Log.w(LOG_TAG, e)
             printMessage("${e.localizedMessage}\n")

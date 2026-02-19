@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -19,7 +21,7 @@ fun MainScreen(viewModel: MainScreenViewModel) {
     MainScreen(
         canTranscribe = viewModel.canTranscribe,
         isRecording = viewModel.isRecording,
-        messageLog = viewModel.dataLog,
+        messageLog = viewModel.transcribedText,
         onBenchmarkTapped = viewModel::benchmark,
         onTranscribeSampleTapped = viewModel::transcribeSample,
         onRecordTapped = viewModel::toggleRecord
@@ -66,9 +68,16 @@ private fun MainScreen(
 
 @Composable
 private fun MessageLog(log: String) {
-    SelectionContainer {
-        Text(modifier = Modifier.verticalScroll(rememberScrollState()), text = log)
+    LazyColumn(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        item {
+            SelectionContainer {
+                Text(log)
+            }
+        }
     }
+
 }
 
 @Composable
