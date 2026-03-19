@@ -173,10 +173,10 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribe(
     struct whisper_full_params params = whisper_full_default_params(WHISPER_SAMPLING_GREEDY);
     params.print_realtime = true;
     params.print_progress = false;
-    params.print_timestamps = true;
+    params.print_timestamps = false;
     params.print_special = false;
     params.translate = false;
-    params.language = "en";
+    params.language = "ru";
     params.n_threads = num_threads;
     params.offset_ms = 0;
     params.no_context = true;

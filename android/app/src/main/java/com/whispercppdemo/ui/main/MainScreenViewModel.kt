@@ -22,13 +22,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
+import android.media.MediaCodec
+import android.media.MediaExtractor
+import android.media.MediaFormat
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 private const val LOG_TAG = "MainScreenViewModel"
 
 class MainScreenViewModel(private val application: Application) : ViewModel() {
     var canTranscribe by mutableStateOf(false)
-        private set
-    var dataLog by mutableStateOf("")
         private set
     var isRecording by mutableStateOf(false)
         private set
@@ -82,14 +85,14 @@ class MainScreenViewModel(private val application: Application) : ViewModel() {
 
     private suspend fun loadBaseModel() = withContext(Dispatchers.IO) {
         printMessage("Loading model...\n")
-        val models = application.assets.list("models/")
-        if (models != null) {
-            whisperContext = com.whispercpp.whisper.WhisperContext.createContextFromAsset(application.assets, "models/" + models[0])
-            printMessage("Loaded model ${models[0]}.\n")
-        }
 
-        //val firstModel = modelsPath.listFiles()!!.first()
-        //whisperContext = WhisperContext.createContextFromFile(firstModel.absolutePath)
+        val models = application.assets.list("models/")?.toList() ?: emptyList()
+        printMessage("Assets models: $models\n")
+
+        val modelName = "models/ggml-base.bin"
+        whisperContext = WhisperContext.createContextFromAsset(application.assets, modelName)
+
+        printMessage("Loaded model $modelName.\n")
     }
 
     fun benchmark() = viewModelScope.launch {
@@ -122,7 +125,139 @@ class MainScreenViewModel(private val application: Application) : ViewModel() {
     private suspend fun readAudioSamples(file: File): FloatArray = withContext(Dispatchers.IO) {
         stopPlayback()
         startPlayback(file)
-        return@withContext decodeWaveFile(file)
+
+        return@withContext when (file.extension.lowercase()) {
+            "wav" -> decodeWaveFile(file)
+            "mp3", "m4a", "aac", "ogg" -> decodeCompressedAudioFile(file)
+            else -> error("Unsupported audio format: ${file.extension}")
+        }
+    }
+
+
+    private suspend fun decodeCompressedAudioFile(file: File): FloatArray = withContext(Dispatchers.IO) {
+        val extractor = MediaExtractor()
+        extractor.setDataSource(file.absolutePath)
+
+        var audioTrackIndex = -1
+        var mediaFormat: MediaFormat? = null
+
+        for (i in 0 until extractor.trackCount) {
+            val format = extractor.getTrackFormat(i)
+            val mime = format.getString(MediaFormat.KEY_MIME) ?: continue
+            if (mime.startsWith("audio/")) {
+                audioTrackIndex = i
+                mediaFormat = format
+                break
+            }
+        }
+
+        if (audioTrackIndex == -1 || mediaFormat == null) {
+            extractor.release()
+            error("No audio track found")
+        }
+
+        extractor.selectTrack(audioTrackIndex)
+
+        val mime = mediaFormat.getString(MediaFormat.KEY_MIME)
+            ?: error("Track mime type is null")
+
+        val codec = MediaCodec.createDecoderByType(mime)
+        codec.configure(mediaFormat, null, null, 0)
+        codec.start()
+
+        val outputStream = java.io.ByteArrayOutputStream()
+        val bufferInfo = MediaCodec.BufferInfo()
+
+        var inputDone = false
+        var outputDone = false
+
+        while (!outputDone) {
+            if (!inputDone) {
+                val inputBufferIndex = codec.dequeueInputBuffer(10_000)
+                if (inputBufferIndex >= 0) {
+                    val inputBuffer = codec.getInputBuffer(inputBufferIndex)
+                        ?: error("Input buffer is null")
+
+                    inputBuffer.clear()
+                    val sampleSize = extractor.readSampleData(inputBuffer, 0)
+
+                    if (sampleSize < 0) {
+                        codec.queueInputBuffer(
+                            inputBufferIndex,
+                            0,
+                            0,
+                            0L,
+                            MediaCodec.BUFFER_FLAG_END_OF_STREAM
+                        )
+                        inputDone = true
+                    } else {
+                        val presentationTimeUs = extractor.sampleTime
+                        codec.queueInputBuffer(
+                            inputBufferIndex,
+                            0,
+                            sampleSize,
+                            presentationTimeUs,
+                            0
+                        )
+                        extractor.advance()
+                    }
+                }
+            }
+
+            val outputBufferIndex = codec.dequeueOutputBuffer(bufferInfo, 10_000)
+
+            when {
+                outputBufferIndex >= 0 -> {
+                    val outputBuffer = codec.getOutputBuffer(outputBufferIndex)
+                        ?: error("Output buffer is null")
+
+                    if (bufferInfo.size > 0) {
+                        outputBuffer.position(bufferInfo.offset)
+                        outputBuffer.limit(bufferInfo.offset + bufferInfo.size)
+
+                        val chunk = ByteArray(bufferInfo.size)
+                        outputBuffer.get(chunk)
+                        outputStream.write(chunk)
+                    }
+
+                    codec.releaseOutputBuffer(outputBufferIndex, false)
+
+                    if ((bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                        outputDone = true
+                    }
+                }
+
+                outputBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
+                    val newFormat = codec.outputFormat
+                    Log.d(LOG_TAG, "Decoder output format changed: $newFormat")
+                }
+
+                outputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER -> {
+                    // ничего не делаем, просто ждем следующий цикл
+                }
+            }
+        }
+
+        codec.stop()
+        codec.release()
+        extractor.release()
+
+        pcm16LeToFloatArray(outputStream.toByteArray())
+    }
+
+    private fun pcm16LeToFloatArray(pcmBytes: ByteArray): FloatArray {
+        val shortCount = pcmBytes.size / 2
+        val samples = FloatArray(shortCount)
+
+        val byteBuffer = ByteBuffer.wrap(pcmBytes).order(ByteOrder.LITTLE_ENDIAN)
+
+        for (i in 0 until shortCount) {
+            val sample = byteBuffer.short.toInt()
+            val normalized = sample / 32768.0f
+            samples[i] = normalized.coerceIn(-1.0f, 1.0f)
+        }
+
+        return samples
     }
 
     private suspend fun stopPlayback() = withContext(Dispatchers.Main) {
@@ -152,6 +287,7 @@ class MainScreenViewModel(private val application: Application) : ViewModel() {
             val start = System.currentTimeMillis()
             val text = whisperContext?.transcribeData(data)
             val elapsed = System.currentTimeMillis() - start
+
             withContext(Dispatchers.Main) {
                 transcribedText = text ?: ""
             }
