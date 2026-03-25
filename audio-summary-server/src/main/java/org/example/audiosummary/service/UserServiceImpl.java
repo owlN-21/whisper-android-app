@@ -2,6 +2,7 @@ package org.example.audiosummary.service;
 
 import org.example.audiosummary.entity.User;
 import org.example.audiosummary.exception.UserAlreadyExistsException;
+import org.example.audiosummary.exception.UserHasTasksException;
 import org.example.audiosummary.exception.UserNotFoundException;
 import org.example.audiosummary.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -46,5 +47,18 @@ public class UserServiceImpl implements UserService{
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
+    }
+
+    @Override
+    @Transactional
+    public void deleteUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        if (!user.getProcessingTasks().isEmpty()) {
+            throw new UserHasTasksException(id);
+        }
+
+        userRepository.delete(user);
     }
 }

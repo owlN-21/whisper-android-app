@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 
+//400 — невалидный email
+//404 — пользователь не найден
+//409 — пользователь уже существует
+//409 — пользователя нельзя удалить, потому что есть связанные задачи
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -50,5 +55,16 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(UserHasTasksException.class)
+    public ResponseEntity<ErrorResponse> handleUserHasTasks(UserHasTasksException ex) {
+        ErrorResponse response = new ErrorResponse(
+                "USER_HAS_TASKS",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 }
