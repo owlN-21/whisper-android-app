@@ -1,0 +1,50 @@
+package org.example.audiosummary.service;
+
+import org.example.audiosummary.entity.User;
+import org.example.audiosummary.exception.UserAlreadyExistsException;
+import org.example.audiosummary.exception.UserNotFoundException;
+import org.example.audiosummary.repository.UserRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+
+@Service
+@Transactional(readOnly = true)
+public class UserServiceImpl implements UserService{
+
+    private final UserRepository userRepository;
+
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    @Transactional
+    public User createUser(String email) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new UserAlreadyExistsException(email);
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        User user = new User();
+        user.setEmail(email);
+        user.setCreatedAt(now);
+        user.setUpdatedAt(now);
+
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(email));
+    }
+}

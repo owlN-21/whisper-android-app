@@ -2,9 +2,9 @@ spring:
   application:
     name: audio-summary-server
   datasource:
-    url: jdbc:postgresql://localhost:5432/audio_summary_db
+    url: jdbc:postgresql://host.docker.internal:5432/audio_summary_db
     username: postgres
-    password: 123
+    password: postgres
     driver-class-name: org.postgresql.Driver
 
   jpa:
