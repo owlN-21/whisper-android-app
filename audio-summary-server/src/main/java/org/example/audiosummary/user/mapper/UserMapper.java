@@ -1,6 +1,6 @@
-package org.example.audiosummary.mapper;
+package org.example.audiosummary.user.mapper;
 
-import org.example.audiosummary.dto.user.UserResponse;
+import org.example.audiosummary.user.dto.UserResponse;
 import org.example.audiosummary.entity.User;
 import org.springframework.stereotype.Component;
 

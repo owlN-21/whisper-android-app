@@ -1,4 +1,4 @@
-package org.example.audiosummary.exception;
+package org.example.audiosummary.user.exception;
 
 public class UserNotFoundException extends RuntimeException {
 

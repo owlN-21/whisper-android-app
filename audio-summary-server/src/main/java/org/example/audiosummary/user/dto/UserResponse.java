@@ -1,4 +1,4 @@
-package org.example.audiosummary.dto.user;
+package org.example.audiosummary.user.dto;
 
 
 import java.time.LocalDateTime;

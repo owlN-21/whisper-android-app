@@ -1,10 +1,10 @@
-package org.example.audiosummary.service;
+package org.example.audiosummary.user.service;
 
 import org.example.audiosummary.entity.User;
-import org.example.audiosummary.exception.UserAlreadyExistsException;
-import org.example.audiosummary.exception.UserHasTasksException;
-import org.example.audiosummary.exception.UserNotFoundException;
-import org.example.audiosummary.repository.UserRepository;
+import org.example.audiosummary.user.exception.UserAlreadyExistsException;
+import org.example.audiosummary.user.exception.UserHasTasksException;
+import org.example.audiosummary.user.exception.UserNotFoundException;
+import org.example.audiosummary.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

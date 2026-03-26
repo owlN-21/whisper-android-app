@@ -1,6 +1,6 @@
-package org.example.audiosummary.service;
+package org.example.audiosummary.healt.service;
 
-import org.example.audiosummary.dto.HealthResponse;
+import org.example.audiosummary.healt.dto.HealthResponse;
 import org.springframework.stereotype.Service;
 
 @Service

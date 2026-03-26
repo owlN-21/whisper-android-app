@@ -1,4 +1,4 @@
-package org.example.audiosummary.repository;
+package org.example.audiosummary.user.repository;
 
 
 import org.example.audiosummary.entity.User;

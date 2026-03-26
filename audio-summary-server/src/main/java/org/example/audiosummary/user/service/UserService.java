@@ -1,4 +1,4 @@
-package org.example.audiosummary.service;
+package org.example.audiosummary.user.service;
 
 
 import org.example.audiosummary.entity.User;

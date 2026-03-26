@@ -1,4 +1,4 @@
-package org.example.audiosummary.exception;
+package org.example.audiosummary.user.exception;
 
 public class UserHasTasksException extends RuntimeException {
     public UserHasTasksException(Long id) {

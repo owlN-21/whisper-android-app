@@ -1,4 +1,4 @@
-package org.example.audiosummary.dto;
+package org.example.audiosummary.healt.dto;
 
 public class HealthResponse {
 

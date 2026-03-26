@@ -1,6 +1,9 @@
-package org.example.audiosummary.exception;
+package org.example.audiosummary.common.exception;
 
-import org.example.audiosummary.dto.error.ErrorResponse;
+import org.example.audiosummary.common.dto.error.ErrorResponse;
+import org.example.audiosummary.user.exception.UserAlreadyExistsException;
+import org.example.audiosummary.user.exception.UserHasTasksException;
+import org.example.audiosummary.user.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

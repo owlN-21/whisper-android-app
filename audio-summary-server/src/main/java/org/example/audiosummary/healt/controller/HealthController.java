@@ -1,7 +1,7 @@
-package org.example.audiosummary.controller;
+package org.example.audiosummary.healt.controller;
 
-import org.example.audiosummary.dto.HealthResponse;
-import org.example.audiosummary.service.HealthService;
+import org.example.audiosummary.healt.dto.HealthResponse;
+import org.example.audiosummary.healt.service.HealthService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

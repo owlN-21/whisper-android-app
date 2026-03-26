@@ -1,11 +1,11 @@
-package org.example.audiosummary.controller;
+package org.example.audiosummary.user.controller;
 
 import jakarta.validation.Valid;
-import org.example.audiosummary.dto.user.CreateUserRequest;
-import org.example.audiosummary.dto.user.UserResponse;
+import org.example.audiosummary.user.dto.CreateUserRequest;
+import org.example.audiosummary.user.dto.UserResponse;
 import org.example.audiosummary.entity.User;
-import org.example.audiosummary.mapper.UserMapper;
-import org.example.audiosummary.service.UserService;
+import org.example.audiosummary.user.mapper.UserMapper;
+import org.example.audiosummary.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

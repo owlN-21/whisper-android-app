@@ -1,4 +1,4 @@
-package org.example.audiosummary.dto.error;
+package org.example.audiosummary.common.dto.error;
 
 import java.time.LocalDateTime;
 

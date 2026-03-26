@@ -1,20 +1,5 @@
 package org.example.audiosummary.repository;
 
-import org.example.audiosummary.entity.*;
-import org.example.audiosummary.repository.ProcessingTaskRepository;
-import org.example.audiosummary.repository.SummaryRepository;
-import org.example.audiosummary.repository.TranscriptRepository;
-import org.example.audiosummary.repository.UserRepository;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 //
 //@DataJpaTest
