@@ -1,10 +1,18 @@
+app:
+  storage:
+    upload-dir: uploads
+
 spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
   application:
     name: audio-summary-server
   datasource:
     url: jdbc:postgresql://host.docker.internal:5432/audio_summary_db
-    username: ${usernameDb}
-    password: ${passwordDB}
+    username: ${USERNAMEDB}
+    password: ${PASSWORDDB}
     driver-class-name: org.postgresql.Driver
 
   jpa:

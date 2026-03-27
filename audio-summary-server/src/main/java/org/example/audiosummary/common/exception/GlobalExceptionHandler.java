@@ -1,6 +1,9 @@
 package org.example.audiosummary.common.exception;
 
 import org.example.audiosummary.common.dto.error.ErrorResponse;
+import org.example.audiosummary.task.exception.FileStorageException;
+import org.example.audiosummary.task.exception.InvalidAudioFileException;
+import org.example.audiosummary.task.exception.ProcessingTaskNotFoundException;
 import org.example.audiosummary.user.exception.UserAlreadyExistsException;
 import org.example.audiosummary.user.exception.UserHasTasksException;
 import org.example.audiosummary.user.exception.UserNotFoundException;
@@ -69,5 +72,38 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(ProcessingTaskNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProcessingTaskNotFound(ProcessingTaskNotFoundException ex) {
+        ErrorResponse response = new ErrorResponse(
+                "PROCESSING_TASK_NOT_FOUND",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(InvalidAudioFileException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidAudioFile(InvalidAudioFileException ex) {
+        ErrorResponse response = new ErrorResponse(
+                "INVALID_AUDIO_FILE",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(FileStorageException.class)
+    public ResponseEntity<ErrorResponse> handleFileStorage(FileStorageException ex) {
+        ErrorResponse response = new ErrorResponse(
+                "FILE_STORAGE_ERROR",
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }
