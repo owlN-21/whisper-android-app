@@ -68,34 +68,6 @@ select id, email, created_at, updated_at from users;
 
 ---
 
-### Проверка user endpoint'ов локально
-
-Создание пользователя:
-
-```http
-POST http://localhost:8080/api/v1/users
-Content-Type: application/json
-
-{
-  "email": "test@example.com"
-}
-```
-
-Получение пользователя по id:
-
-```http
-GET http://localhost:8080/api/v1/users/1
-```
-
-Получение пользователя по email:
-
-```http
-GET http://localhost:8080/api/v1/users/by-email?email=test@example.com
-```
-
-После успешного `POST /api/v1/users` запись должна появиться в таблице `users`.
-
----
 
 ## Запуск через Docker
 
@@ -226,7 +198,7 @@ select id, email, created_at, updated_at from users;
 
 ---
 
-## Минимальный сценарий ручной проверки
+## Минимальный сценарий ручной проверки user логики
 
 1. Запустить PostgreSQL.
 2. Запустить backend локально или через Docker.
@@ -249,9 +221,11 @@ select id, email, created_at, updated_at from users;
 
     * `select * from users;`
 
-### Проверка task endpoint'ов локально
+---
 
-Сначала нужно создать пользователя, так как задача всегда привязывается к существующему пользователю.
+## Проверка task endpoint'ов локально
+
+Сначала нужно создать пользователя, так как задача всегда привязывается к существующему пользователю!
 
 Создание задачи с загрузкой аудиофайла:
 
@@ -300,6 +274,11 @@ DELETE http://localhost:8080/api/tasks/1
 * файл должен сохраниться в локальное хранилище
 * запись должна появиться в таблице `processing_tasks`
 * задача должна получить статус `UPLOADED`
+
+# В таблице processing_tasks:
+
+`original_filename` — исходное имя файла
+`storage_path` — путь к сохраненному файлу
 
 После успешного `DELETE /api/tasks/{taskId}`:
 
@@ -362,8 +341,7 @@ GET http://localhost:8080/api/users/1/tasks
 ```http
 DELETE http://localhost:8080/api/tasks/1
 ```
-
-Если backend запущен в Docker без volume, файл будет храниться внутри контейнера.
+### Если при загрузке файла приходит 413 Request Entity Too Large (Размер указан в application.yml)
 
 ---
 
