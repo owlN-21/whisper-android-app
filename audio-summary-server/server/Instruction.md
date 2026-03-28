@@ -93,7 +93,10 @@ docker run -p 8080:8080 audio-summary-server
 ```shell
 docker run --env-file src/main/resources/.env -p 8080:8080 audio-summary-server
 ```
-
+Запуск:
+```shell
+docker compose up --build
+```
 
 Проверка health endpoint:
 
