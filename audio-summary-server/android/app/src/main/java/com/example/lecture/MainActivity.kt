@@ -7,11 +7,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.ViewModelProvider
 import com.example.lecture.data.local.UserSessionStorage
 import com.example.lecture.data.remote.NetworkModule
-import com.example.lecture.data.repository.UserRepository
-import com.example.lecture.ui.screen.LoginScreen
+import com.example.lecture.data.repository.TaskRepository
+import com.example.lecture.ui.screen.UploadAudioScreen
 import com.example.lecture.ui.theme.LectureTheme
-import com.example.lecture.ui.viewmodel.LoginViewModel
-import com.example.lecture.ui.viewmodel.LoginViewModelFactory
+import com.example.lecture.ui.viewmodel.UploadAudioViewModel
+import com.example.lecture.ui.viewmodel.UploadAudioViewModelFactory
 
 class MainActivity : ComponentActivity() {
 
@@ -20,19 +20,19 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val userSessionStorage = UserSessionStorage(applicationContext)
-        val userRepository = UserRepository(
-            userApi = NetworkModule.userApi,
-            userSessionStorage = userSessionStorage
+        val taskRepository = TaskRepository(
+            context = applicationContext,
+            taskApi = NetworkModule.taskApi
         )
 
-        val loginViewModel = ViewModelProvider(
+        val uploadAudioViewModel = ViewModelProvider(
             this,
-            LoginViewModelFactory(userRepository)
-        )[LoginViewModel::class.java]
+            UploadAudioViewModelFactory(taskRepository, userSessionStorage)
+        )[UploadAudioViewModel::class.java]
 
         setContent {
             LectureTheme {
-                LoginScreen(loginViewModel = loginViewModel)
+                UploadAudioScreen(uploadAudioViewModel = uploadAudioViewModel)
             }
         }
     }
