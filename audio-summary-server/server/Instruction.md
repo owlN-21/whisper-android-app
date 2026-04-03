@@ -97,7 +97,10 @@ docker run --env-file src/main/resources/.env -p 8080:8080 audio-summary-server
 ```shell
 docker compose up --build
 ```
-
+запуск контейнера audiosummary-postgres:
+```shell
+docker exec -it audiosummary-postgres psql -U ${APP_USER} -d ${APP_DB}
+```
 Проверка health endpoint:
 
 ```text
@@ -376,4 +379,100 @@ DELETE http://localhost:8080/api/tasks/1
 10. Повторно проверить таблицу:
 
     * `select * from processing_tasks;`
+
+
+### Минимальный сценарий ручной проверки summary логики в Docker
+
+1. Запустить контейнеры:
+
+```shell
+docker compose up --build
+```
+
+2. Проверить health endpoint:
+
+```http
+GET http://localhost:8080/health
+```
+
+3. Создать пользователя:
+
+```http
+POST http://localhost:8080/api/v1/users
+Content-Type: application/json
+
+{
+  "email": "test-summary@example.com"
+}
+```
+
+4. Загрузить аудиофайл:
+
+```http
+POST http://localhost:8080/api/users/{userId}/tasks
+Content-Type: multipart/form-data
+```
+
+В Postman:
+
+* выбрать `Body`
+* выбрать `form-data`
+* добавить поле `file`
+* тип поля `File`
+* выбрать аудиофайл
+
+5. Проверить, что задача сохранилась:
+
+```http
+GET http://localhost:8080/api/users/{userId}/tasks
+```
+
+6. Подключиться к PostgreSQL внутри Docker:
+
+```shell
+docker exec -it audiosummary-postgres psql -U ${APP_USER} -d ${APP_DB}
+```
+
+7. Проверить таблицу `processing_tasks`:
+
+```sql
+select * from processing_tasks;
+```
+
+8. Проверить таблицу `summaries`:
+
+```sql
+select * from summaries;
+```
+
+9. Проверить основные поля summary:
+
+```sql
+select id, task_id, content, created_at from summaries;
+```
+
+После успешного `POST /api/users/{userId}/tasks`:
+
+* запись должна появиться в таблице `processing_tasks`
+* запись должна появиться в таблице `summaries`
+* `summaries.task_id` должен ссылаться на созданную задачу
+* в поле `content` должен сохраниться текст заглушки
+
+10. Удалить задачу:
+
+```http
+DELETE http://localhost:8080/api/tasks/{taskId}
+```
+
+11. Повторно проверить таблицы:
+
+```sql
+select * from processing_tasks;
+select * from summaries;
+```
+
+После успешного `DELETE /api/tasks/{taskId}`:
+
+* запись должна быть удалена из таблицы `processing_tasks`
+* связанная запись в таблице `summaries` должна удалиться автоматически
 

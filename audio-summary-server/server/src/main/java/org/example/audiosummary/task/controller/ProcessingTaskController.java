@@ -1,5 +1,7 @@
 package org.example.audiosummary.task.controller;
 
+import org.example.audiosummary.summary.dto.TaskResultResponse;
+import org.example.audiosummary.summary.service.SummaryService;
 import org.example.audiosummary.task.dto.ProcessingTaskResponse;
 import org.example.audiosummary.task.service.ProcessingTaskService;
 import org.springframework.http.HttpStatus;
@@ -14,9 +16,11 @@ import java.util.List;
 public class ProcessingTaskController {
 
     private final ProcessingTaskService processingTaskService;
+    private final SummaryService summaryService;
 
-    public ProcessingTaskController(ProcessingTaskService processingTaskService) {
+    public ProcessingTaskController(ProcessingTaskService processingTaskService, SummaryService summaryService) {
         this.processingTaskService = processingTaskService;
+        this.summaryService = summaryService;
     }
 
     @PostMapping(
@@ -41,9 +45,16 @@ public class ProcessingTaskController {
         return processingTaskService.getTasksByUserId(userId);
     }
 
+    @GetMapping("/tasks/{taskId}/result")
+    public TaskResultResponse getTaskResult(@PathVariable Long taskId) {
+        return summaryService.getResultByTaskId(taskId);
+    }
+
     @DeleteMapping("/tasks/{taskId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTask(@PathVariable Long taskId) {
         processingTaskService.deleteTask(taskId);
     }
+
+
 }

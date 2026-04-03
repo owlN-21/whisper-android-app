@@ -12,7 +12,7 @@ public class Summary {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne
     @JoinColumn(name = "task_id", nullable = false, unique = true)
     private ProcessingTask processingTask;
 
