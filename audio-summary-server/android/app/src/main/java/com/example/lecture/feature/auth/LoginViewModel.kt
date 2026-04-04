@@ -1,4 +1,4 @@
-package com.example.lecture.ui.viewmodel
+package com.example.lecture.feature.auth
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

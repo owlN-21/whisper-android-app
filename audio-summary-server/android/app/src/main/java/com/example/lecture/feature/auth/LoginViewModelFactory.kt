@@ -1,4 +1,4 @@
-package com.example.lecture.ui.viewmodel
+package com.example.lecture.feature.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

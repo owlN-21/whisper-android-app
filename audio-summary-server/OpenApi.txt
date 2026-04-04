@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Audio Summary Main Backend API
-  version: 1.0.0
+  version: 1.1.0
   description: Current backend API for Android integration at the current development stage.
 
 servers:
@@ -12,7 +12,7 @@ tags:
   - name: Users
     description: User management endpoints
   - name: Tasks
-    description: Audio upload and processing task endpoints
+    description: Audio upload, task management and task result endpoints
 
 paths:
   /api/v1/users:
@@ -54,7 +54,13 @@ paths:
       summary: Get user by id
       operationId: getUserById
       parameters:
-        - $ref: '#/components/parameters/UserId'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          example: 1
       responses:
         '200':
           description: User found
@@ -75,7 +81,13 @@ paths:
       summary: Delete user by id
       operationId: deleteUserById
       parameters:
-        - $ref: '#/components/parameters/UserId'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          example: 1
       responses:
         '204':
           description: User deleted
@@ -222,6 +234,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/tasks/{taskId}/result:
+    get:
+      tags:
+        - Tasks
+      summary: Get task result by task id
+      operationId: getTaskResult
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '200':
+          description: Task result found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResultResponse'
+        '404':
+          description: Task result not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   parameters:
     UserId:
@@ -322,6 +356,23 @@ components:
         - status
         - createdAt
         - updatedAt
+
+    TaskResultResponse:
+      type: object
+      properties:
+        taskId:
+          type: integer
+          format: int64
+          example: 101
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        summary:
+          type: string
+          example: Это временная заглушка summary. Processing-service пока не подключен.
+      required:
+        - taskId
+        - status
+        - summary
 
     TaskStatus:
       type: string

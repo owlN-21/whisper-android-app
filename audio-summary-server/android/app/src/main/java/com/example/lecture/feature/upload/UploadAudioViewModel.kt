@@ -1,4 +1,4 @@
-package com.example.lecture.ui.viewmodel
+package com.example.lecture.feature.upload
 
 import android.net.Uri
 import androidx.compose.runtime.getValue
@@ -6,14 +6,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lecture.data.local.UserSessionStorage
 import com.example.lecture.data.repository.TaskRepository
+import com.example.lecture.data.repository.UserRepository
 import kotlinx.coroutines.launch
-
 
 class UploadAudioViewModel(
     private val taskRepository: TaskRepository,
-    private val userSessionStorage: UserSessionStorage
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     var isLoading by mutableStateOf(false)
@@ -23,7 +22,7 @@ class UploadAudioViewModel(
         private set
 
     fun uploadAudio(fileUri: Uri) {
-        val userId = userSessionStorage.getUserId()
+        val userId = userRepository.getSavedUserId()
 
         if (userId == null) {
             message = "Пользователь не найден. Сначала выполните вход."
