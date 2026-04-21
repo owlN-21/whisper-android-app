@@ -8,11 +8,6 @@ class CreateSummaryRequest(BaseModel):
     text: str
 
 
-class ProcessingAcceptedResponse(BaseModel):
-    taskId: int
-    status: Literal["ACCEPTED"]
-
-
 class SummaryInProgressResponse(BaseModel):
     taskId: int
     status: Literal["IN_PROGRESS"]

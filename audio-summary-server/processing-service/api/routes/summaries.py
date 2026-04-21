@@ -1,9 +1,8 @@
 from fastapi import APIRouter, status
 
+from api.schemas.common_schema import ProcessingAcceptedResponse
 from api.schemas.summary_schema import (
     CreateSummaryRequest,
-    ProcessingAcceptedResponse,
-    SummaryCompletedResponse,
     SummaryInProgressResponse,
     SummaryResultResponse
 )
