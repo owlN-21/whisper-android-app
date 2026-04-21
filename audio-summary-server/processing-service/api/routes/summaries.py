@@ -1,5 +1,6 @@
 from fastapi import APIRouter, status
 
+from api.exceptions.handlers import TaskNotFoundException
 from api.schemas.common_schema import ProcessingAcceptedResponse
 from api.schemas.error_schema import ApiErrorResponse
 from api.schemas.summary_schema import (
@@ -39,7 +40,4 @@ async def create_summary(
     }
 )
 async def get_summary_by_task_id(taskId: int) -> SummaryResultResponse:
-    return SummaryInProgressResponse(
-        taskId=taskId,
-        status="IN_PROGRESS"
-    )
+    raise TaskNotFoundException(taskId)
