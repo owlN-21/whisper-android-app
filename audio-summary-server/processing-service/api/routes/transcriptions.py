@@ -25,7 +25,7 @@ async def create_transcription(
     taskId: int = Form(...),
     file: UploadFile = File(...)
 ) -> ProcessingAcceptedResponse:
-    result = transcription_service.create_task(taskId)
+    result = await transcription_service.create_task(taskId, file)
 
     return ProcessingAcceptedResponse(
         taskId=result["taskId"],
