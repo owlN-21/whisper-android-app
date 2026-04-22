@@ -1,3 +1,4 @@
+from typing import Literal
 from fastapi import APIRouter, File, Form, UploadFile, status
 
 from api.schemas.common_schema import ProcessingAcceptedResponse
@@ -9,7 +10,6 @@ from api.schemas.transcription_schema import (
     TranscriptionResultResponse
 )
 from processing.dependencies import transcription_service
-from typing import Literal
 
 router = APIRouter(prefix="/api/v1/transcriptions", tags=["Transcriptions"])
 

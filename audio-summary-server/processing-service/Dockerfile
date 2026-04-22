@@ -9,5 +9,3 @@ RUN python -m ensurepip --upgrade \
     && python -m pip install --no-cache-dir --default-timeout=300 --retries 10 -r /app/requirements.txt
 
 COPY . /app
-
-ENTRYPOINT ["python"]
