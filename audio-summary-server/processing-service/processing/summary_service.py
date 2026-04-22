@@ -27,10 +27,10 @@ class SummaryService:
             )
         except SummarizationError as error:
             self.task_storage.mark_summary_failed(task_id, str(error))
-            raise InternalProcessingException(str(error))
+            raise InternalProcessingException(str(error)) from error
         except Exception as error:
             self.task_storage.mark_summary_failed(task_id, str(error))
-            raise InternalProcessingException(str(error))
+            raise InternalProcessingException(str(error)) from error
 
         return {
             "taskId": task_id,
