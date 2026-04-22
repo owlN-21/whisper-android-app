@@ -3,6 +3,8 @@ from fastapi import APIRouter, File, Form, UploadFile, status
 from api.schemas.common_schema import ProcessingAcceptedResponse
 from api.schemas.error_schema import ApiErrorResponse
 from api.schemas.transcription_schema import (
+    TranscriptionCompletedResponse,
+    TranscriptionFailedResponse,
     TranscriptionInProgressResponse,
     TranscriptionResultResponse
 )
@@ -44,7 +46,21 @@ async def create_transcription(
 async def get_transcription_by_task_id(taskId: int) -> TranscriptionResultResponse:
     task = transcription_service.get_task(taskId)
 
-    return TranscriptionInProgressResponse(
+    if task["status"] == "IN_PROGRESS":
+        return TranscriptionInProgressResponse(
+            taskId=task["taskId"],
+            status=task["status"]
+        )
+
+    if task["status"] == "COMPLETED":
+        return TranscriptionCompletedResponse(
+            taskId=task["taskId"],
+            status=task["status"],
+            text=task["text"]
+        )
+
+    return TranscriptionFailedResponse(
         taskId=task["taskId"],
-        status=task["status"]
+        status=task["status"],
+        errorMessage=task["errorMessage"]
     )

@@ -17,15 +17,24 @@ class TranscriptionService:
         self.upload_dir.mkdir(parents=True, exist_ok=True)
 
     async def create_task(self, task_id: int, file: UploadFile) -> dict:
-        if not file.filename:
+        if file.filename is None or file.filename == "":
             raise InvalidRequestException("Uploaded file must have a filename")
 
         self.task_storage.create_transcription_task(task_id)
 
-        file_path = self.upload_dir / f"{task_id}_{file.filename}"
+        try:
+            file_path = self.upload_dir / f"{task_id}_{file.filename}"
 
-        content = await file.read()
-        file_path.write_bytes(content)
+            content = await file.read()
+            file_path.write_bytes(content)
+
+            self.task_storage.mark_transcription_completed(
+                task_id,
+                text="Это тестовый распознанный текст."
+            )
+        except Exception as error:
+            self.task_storage.mark_transcription_failed(task_id, str(error))
+            raise
 
         return {
             "taskId": task_id,

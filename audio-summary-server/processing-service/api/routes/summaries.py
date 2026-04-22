@@ -4,6 +4,8 @@ from api.schemas.common_schema import ProcessingAcceptedResponse
 from api.schemas.error_schema import ApiErrorResponse
 from api.schemas.summary_schema import (
     CreateSummaryRequest,
+    SummaryCompletedResponse,
+    SummaryFailedResponse,
     SummaryInProgressResponse,
     SummaryResultResponse
 )
@@ -25,7 +27,7 @@ router = APIRouter(prefix="/api/v1/summaries", tags=["Summaries"])
 async def create_summary(
     request: CreateSummaryRequest
 ) -> ProcessingAcceptedResponse:
-    result = summary_service.create_task(request.taskId)
+    result = summary_service.create_task(request.taskId, request.text)
 
     return ProcessingAcceptedResponse(
         taskId=result["taskId"],
@@ -44,7 +46,21 @@ async def create_summary(
 async def get_summary_by_task_id(taskId: int) -> SummaryResultResponse:
     task = summary_service.get_task(taskId)
 
-    return SummaryInProgressResponse(
+    if task["status"] == "IN_PROGRESS":
+        return SummaryInProgressResponse(
+            taskId=task["taskId"],
+            status=task["status"]
+        )
+
+    if task["status"] == "COMPLETED":
+        return SummaryCompletedResponse(
+            taskId=task["taskId"],
+            status=task["status"],
+            content=task["content"]
+        )
+
+    return SummaryFailedResponse(
         taskId=task["taskId"],
-        status=task["status"]
+        status=task["status"],
+        errorMessage=task["errorMessage"]
     )
