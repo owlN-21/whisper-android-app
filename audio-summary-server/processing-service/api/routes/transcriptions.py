@@ -9,6 +9,7 @@ from api.schemas.transcription_schema import (
     TranscriptionResultResponse
 )
 from processing.dependencies import transcription_service
+from typing import Literal
 
 router = APIRouter(prefix="/api/v1/transcriptions", tags=["Transcriptions"])
 
@@ -25,15 +26,15 @@ router = APIRouter(prefix="/api/v1/transcriptions", tags=["Transcriptions"])
 )
 async def create_transcription(
     taskId: int = Form(...),
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    model: Literal["tone", "whisper"] = Form("tone")
 ) -> ProcessingAcceptedResponse:
-    result = await transcription_service.create_task(taskId, file)
+    result = await transcription_service.create_task(taskId, file, model)
 
     return ProcessingAcceptedResponse(
         taskId=result["taskId"],
         status=result["status"]
     )
-
 
 @router.get(
     "/{taskId}",
