@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, UTC
+from datetime import datetime, timedelta, timezone
 
 from api.exceptions.handlers import TaskAlreadyExistsException, TaskNotFoundException
 
@@ -20,7 +20,7 @@ class InMemoryTaskStorage:
             "status": "IN_PROGRESS",
             "text": None,
             "errorMessage": None,
-            "createdAt": datetime.now(UTC)
+            "createdAt": datetime.now(timezone.utc)
         }
 
     def get_transcription_task(self, task_id: int) -> dict:
@@ -55,7 +55,7 @@ class InMemoryTaskStorage:
             "status": "IN_PROGRESS",
             "content": None,
             "errorMessage": None,
-            "createdAt": datetime.now(UTC)
+            "createdAt": datetime.now(timezone.utc)
         }
 
     def get_summary_task(self, task_id: int) -> dict:
@@ -80,7 +80,7 @@ class InMemoryTaskStorage:
         task["errorMessage"] = error_message
 
     def _cleanup_expired_tasks(self) -> None:
-        now = datetime.now(UTC)
+        now = datetime.now(timezone.utc)
 
         expired_transcription_ids = [
             task_id
