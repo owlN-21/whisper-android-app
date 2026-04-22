@@ -1,6 +1,5 @@
 from fastapi import APIRouter, status
 
-from api.exceptions.handlers import TaskNotFoundException
 from api.schemas.common_schema import ProcessingAcceptedResponse
 from api.schemas.error_schema import ApiErrorResponse
 from api.schemas.summary_schema import (
@@ -8,6 +7,7 @@ from api.schemas.summary_schema import (
     SummaryInProgressResponse,
     SummaryResultResponse
 )
+from processing.dependencies import summary_service
 
 router = APIRouter(prefix="/api/v1/summaries", tags=["Summaries"])
 
@@ -25,9 +25,11 @@ router = APIRouter(prefix="/api/v1/summaries", tags=["Summaries"])
 async def create_summary(
     request: CreateSummaryRequest
 ) -> ProcessingAcceptedResponse:
+    result = summary_service.create_task(request.taskId)
+
     return ProcessingAcceptedResponse(
-        taskId=request.taskId,
-        status="ACCEPTED"
+        taskId=result["taskId"],
+        status=result["status"]
     )
 
 
@@ -40,4 +42,9 @@ async def create_summary(
     }
 )
 async def get_summary_by_task_id(taskId: int) -> SummaryResultResponse:
-    raise TaskNotFoundException(taskId)
+    task = summary_service.get_task(taskId)
+
+    return SummaryInProgressResponse(
+        taskId=task["taskId"],
+        status=task["status"]
+    )

@@ -6,6 +6,7 @@ from api.schemas.transcription_schema import (
     TranscriptionInProgressResponse,
     TranscriptionResultResponse
 )
+from processing.dependencies import transcription_service
 
 router = APIRouter(prefix="/api/v1/transcriptions", tags=["Transcriptions"])
 
@@ -24,9 +25,11 @@ async def create_transcription(
     taskId: int = Form(...),
     file: UploadFile = File(...)
 ) -> ProcessingAcceptedResponse:
+    result = transcription_service.create_task(taskId)
+
     return ProcessingAcceptedResponse(
-        taskId=taskId,
-        status="ACCEPTED"
+        taskId=result["taskId"],
+        status=result["status"]
     )
 
 
@@ -39,7 +42,9 @@ async def create_transcription(
     }
 )
 async def get_transcription_by_task_id(taskId: int) -> TranscriptionResultResponse:
+    task = transcription_service.get_task(taskId)
+
     return TranscriptionInProgressResponse(
-        taskId=taskId,
-        status="IN_PROGRESS"
+        taskId=task["taskId"],
+        status=task["status"]
     )
