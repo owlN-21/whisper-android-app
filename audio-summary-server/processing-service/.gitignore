@@ -1,12 +1,21 @@
-.venv
-__pycache__
+.venv/
+__pycache__/
 *.pyc
-.idea
-.vscode
+*.pyo
+*.pyd
 
+.idea/
+.vscode/
+
+.env
+*.log
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+data/
 output.txt
 output_tone.txt
 summary.txt
 audio.mp3
-
-data/
