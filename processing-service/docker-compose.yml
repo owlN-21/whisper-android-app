@@ -1,0 +1,32 @@
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s 
+
+  processing-service:
+    build: .
+    container_name: processing-service
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./data:/app/data
+    entrypoint: ["uvicorn"]
+    command: ["api.app:app", "--host", "0.0.0.0", "--port", "8090"]
+
+volumes:
+  ollama_data:
