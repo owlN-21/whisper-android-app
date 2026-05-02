@@ -1,0 +1,54 @@
+ninja: Entering directory `D:\diplom\WhisperAndroid\MyWhisperAndroidApp\android\lib\.cxx\RelWithDebInfo\2s4s5326\arm64-v8a'
+[1/33] Building C object CMakeFiles/whisper_v8fp16_va.dir/jni.c.o
+D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/src/main/jni/whisper/jni.c:94:15: warning: 'whisper_init' is deprecated: use whisper_init_with_params instead [-Wdeprecated-declarations]
+    context = whisper_init(&loader);
+              ^
+D:/diplom/WhisperAndroid/MyWhisperAndroidApp/third_party/whisper.cpp/include/whisper.h:224:5: note: 'whisper_init' has been explicitly marked deprecated here
+    WHISPER_DEPRECATED(
+    ^
+D:/diplom/WhisperAndroid/MyWhisperAndroidApp/third_party/whisper.cpp/include/whisper.h:12:64: note: expanded from macro 'WHISPER_DEPRECATED'
+#    define WHISPER_DEPRECATED(func, hint) func __attribute__((deprecated(hint)))
+                                                               ^
+1 warning generated.
+[2/33] Building C object CMakeFiles/whisper.dir/jni.c.o
+D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/src/main/jni/whisper/jni.c:94:15: warning: 'whisper_init' is deprecated: use whisper_init_with_params instead [-Wdeprecated-declarations]
+    context = whisper_init(&loader);
+              ^
+D:/diplom/WhisperAndroid/MyWhisperAndroidApp/third_party/whisper.cpp/include/whisper.h:224:5: note: 'whisper_init' has been explicitly marked deprecated here
+    WHISPER_DEPRECATED(
+    ^
+D:/diplom/WhisperAndroid/MyWhisperAndroidApp/third_party/whisper.cpp/include/whisper.h:12:64: note: expanded from macro 'WHISPER_DEPRECATED'
+#    define WHISPER_DEPRECATED(func, hint) func __attribute__((deprecated(hint)))
+                                                               ^
+1 warning generated.
+[3/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o
+[4/33] Building C object _deps/ggml-build/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o
+[5/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o
+[6/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o
+[7/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml-base.dir/ggml-threading.cpp.o
+[8/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml-base.dir/ggml.cpp.o
+[9/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o
+[10/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o
+[11/33] Building C object _deps/ggml-build/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o
+[12/33] Building C object _deps/ggml-build/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o
+[13/33] Building C object _deps/ggml-build/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o
+[14/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml.dir/ggml-backend-dl.cpp.o
+[15/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o
+[16/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o
+[17/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o
+[18/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o
+[19/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o
+[20/33] Building C object _deps/ggml-build/src/CMakeFiles/ggml-base.dir/ggml.c.o
+[21/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o
+[22/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o
+[23/33] Building C object _deps/ggml-build/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o
+[24/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o
+[25/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml-base.dir/gguf.cpp.o
+[26/33] Linking CXX shared library D:\diplom\WhisperAndroid\MyWhisperAndroidApp\android\lib\build\intermediates\cxx\RelWithDebInfo\2s4s5326\obj\arm64-v8a\libggml-base.so
+[27/33] Building CXX object _deps/ggml-build/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o
+[28/33] Linking CXX shared library D:\diplom\WhisperAndroid\MyWhisperAndroidApp\android\lib\build\intermediates\cxx\RelWithDebInfo\2s4s5326\obj\arm64-v8a\libggml-cpu.so
+[29/33] Linking CXX shared library D:\diplom\WhisperAndroid\MyWhisperAndroidApp\android\lib\build\intermediates\cxx\RelWithDebInfo\2s4s5326\obj\arm64-v8a\libggml.so
+[30/33] Building CXX object CMakeFiles/whisper_v8fp16_va.dir/D_/diplom/WhisperAndroid/MyWhisperAndroidApp/third_party/whisper.cpp/src/whisper.cpp.o
+[31/33] Building CXX object CMakeFiles/whisper.dir/D_/diplom/WhisperAndroid/MyWhisperAndroidApp/third_party/whisper.cpp/src/whisper.cpp.o
+[32/33] Linking CXX shared library D:\diplom\WhisperAndroid\MyWhisperAndroidApp\android\lib\build\intermediates\cxx\RelWithDebInfo\2s4s5326\obj\arm64-v8a\libwhisper_v8fp16_va.so
+[33/33] Linking CXX shared library D:\diplom\WhisperAndroid\MyWhisperAndroidApp\android\lib\build\intermediates\cxx\RelWithDebInfo\2s4s5326\obj\arm64-v8a\libwhisper.so

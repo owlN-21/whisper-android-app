@@ -1,0 +1,21 @@
+# ninja log v5
+0	2479	7931263461159409	ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-mkdir	2887f805ee764c4b
+0	2479	7931263461159409	D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/x86_64/_deps/ggml-subbuild/ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-mkdir	2887f805ee764c4b
+2480	3900	7931263475205052	ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-download	a110568212b624c
+2480	3900	7931263475205052	D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/x86_64/_deps/ggml-subbuild/ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-download	a110568212b624c
+3900	4125	7931263477812108	ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-update	3fa7925c0aa90f50
+3900	4125	7931263477812108	D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/x86_64/_deps/ggml-subbuild/ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-update	3fa7925c0aa90f50
+4126	4321	7931263479787201	ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-patch	f37e06911f375ce
+4126	4321	7931263479787201	D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/x86_64/_deps/ggml-subbuild/ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-patch	f37e06911f375ce
+4321	4516	7931263481738607	ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-configure	b55bc1ea6a5174e7
+4321	4516	7931263481738607	D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/x86_64/_deps/ggml-subbuild/ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-configure	b55bc1ea6a5174e7
+4516	4682	7931263483396661	ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-build	1b3383a7f27d98b9
+4516	4682	7931263483396661	D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/x86_64/_deps/ggml-subbuild/ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-build	1b3383a7f27d98b9
+4682	4854	7931263485112564	ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-install	43f58d51351484ba
+4682	4854	7931263485112564	D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/x86_64/_deps/ggml-subbuild/ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-install	43f58d51351484ba
+4854	5046	7931263487023240	ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-test	e1b95198ead5075
+4854	5046	7931263487023240	D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/x86_64/_deps/ggml-subbuild/ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-test	e1b95198ead5075
+5047	5239	7931263488967312	CMakeFiles/ggml-populate-complete	6638d0b1da405358
+5047	5239	7931263488967312	ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-done	6638d0b1da405358
+5047	5239	7931263488967312	D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/x86_64/_deps/ggml-subbuild/CMakeFiles/ggml-populate-complete	6638d0b1da405358
+5047	5239	7931263488967312	D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/x86_64/_deps/ggml-subbuild/ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-done	6638d0b1da405358
