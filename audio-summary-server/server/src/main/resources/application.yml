@@ -2,6 +2,9 @@ app:
   storage:
     upload-dir: uploads
 
+  processing-service:
+    base-url: ${APP_PROCESSING_SERVICE_BASE_URL:http://localhost:8090}
+
 spring:
   servlet:
     multipart:

@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 
-//400 — невалидный email
-//404 — пользователь не найден
-//409 — пользователь уже существует
-//409 — пользователя нельзя удалить, потому что есть связанные задачи
+//400 - невалидный email
+//404 - пользователь не найден
+//409 - пользователь уже существует
+//409 - пользователя нельзя удалить, потому что есть связанные задачи
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
