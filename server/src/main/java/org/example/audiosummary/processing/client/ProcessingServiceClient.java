@@ -7,7 +7,7 @@ import org.example.audiosummary.processing.dto.TranscriptionResultResponse;
 import java.nio.file.Path;
 
 public interface ProcessingServiceClient {
-    ProcessingAcceptedResponse createTranscription(
+    ProcessingAcceptedResponse  createTranscription(
             Long taskId,
             Path audioFilePath
     );
