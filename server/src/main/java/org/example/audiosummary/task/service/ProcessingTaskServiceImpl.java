@@ -3,6 +3,7 @@ package org.example.audiosummary.task.service;
 import org.example.audiosummary.entity.ProcessingTask;
 import org.example.audiosummary.entity.TaskStatus;
 import org.example.audiosummary.entity.User;
+import org.example.audiosummary.processing.service.AudioProcessingService;
 import org.example.audiosummary.summary.service.SummaryService;
 import org.example.audiosummary.task.repository.ProcessingTaskRepository;
 import org.example.audiosummary.task.dto.ProcessingTaskResponse;
@@ -25,18 +26,20 @@ public class ProcessingTaskServiceImpl implements ProcessingTaskService {
     private final FileStorageService fileStorageService;
     private final ProcessingTaskMapper processingTaskMapper;
     private final SummaryService summaryService;
+    private final AudioProcessingService audioProcessingService;
 
     public ProcessingTaskServiceImpl(
             ProcessingTaskRepository processingTaskRepository,
             UserRepository userRepository,
             FileStorageService fileStorageService,
-            ProcessingTaskMapper processingTaskMapper, SummaryService summaryService
+            ProcessingTaskMapper processingTaskMapper, SummaryService summaryService, AudioProcessingService audioProcessingService
     ) {
         this.processingTaskRepository = processingTaskRepository;
         this.userRepository = userRepository;
         this.fileStorageService = fileStorageService;
         this.processingTaskMapper = processingTaskMapper;
         this.summaryService = summaryService;
+        this.audioProcessingService = audioProcessingService;
     }
 
     @Override
@@ -61,7 +64,7 @@ public class ProcessingTaskServiceImpl implements ProcessingTaskService {
         );
 
         ProcessingTask savedTask = processingTaskRepository.save(task);
-        summaryService.createStubSummary(savedTask);
+        audioProcessingService.startProcessing(savedTask);
         return processingTaskMapper.toResponse(savedTask);
     }
 
