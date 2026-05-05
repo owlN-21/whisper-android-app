@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @EnableConfigurationProperties(ProcessingServiceProperties.class)
 public class AudioSummaryApplication {
 
-    public static void main(String[] args){
-        SpringApplication.run(AudioSummaryApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(AudioSummaryApplication.class, args);
+  }
 }

@@ -1,5 +1,6 @@
 package org.example.audiosummary.common.exception;
 
+import java.time.LocalDateTime;
 import org.example.audiosummary.common.dto.error.ErrorResponse;
 import org.example.audiosummary.task.exception.FileStorageException;
 import org.example.audiosummary.task.exception.InvalidAudioFileException;
@@ -13,97 +14,73 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
-
-//400 - невалидный email
-//404 - пользователь не найден
-//409 - пользователь уже существует
-//409 - пользователя нельзя удалить, потому что есть связанные задачи
+// 400 - невалидный email
+// 404 - пользователь не найден
+// 409 - пользователь уже существует
+// 409 - пользователя нельзя удалить, потому что есть связанные задачи
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
-        ErrorResponse response = new ErrorResponse(
-                "USER_NOT_FOUND",
-                ex.getMessage(),
-                LocalDateTime.now()
-        );
+  @ExceptionHandler(UserNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
+    ErrorResponse response =
+        new ErrorResponse("USER_NOT_FOUND", ex.getMessage(), LocalDateTime.now());
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-    }
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+  }
 
-    @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException ex) {
-        ErrorResponse response = new ErrorResponse(
-                "USER_ALREADY_EXISTS",
-                ex.getMessage(),
-                LocalDateTime.now()
-        );
+  @ExceptionHandler(UserAlreadyExistsException.class)
+  public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException ex) {
+    ErrorResponse response =
+        new ErrorResponse("USER_ALREADY_EXISTS", ex.getMessage(), LocalDateTime.now());
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-    }
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+  }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
-        String message = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .findFirst()
-                .map(error -> error.getDefaultMessage())
-                .orElse("Validation error");
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
+    String message =
+        ex.getBindingResult().getFieldErrors().stream()
+            .findFirst()
+            .map(error -> error.getDefaultMessage())
+            .orElse("Validation error");
 
-        ErrorResponse response = new ErrorResponse(
-                "VALIDATION_ERROR",
-                message,
-                LocalDateTime.now()
-        );
+    ErrorResponse response = new ErrorResponse("VALIDATION_ERROR", message, LocalDateTime.now());
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-    }
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+  }
 
-    @ExceptionHandler(UserHasTasksException.class)
-    public ResponseEntity<ErrorResponse> handleUserHasTasks(UserHasTasksException ex) {
-        ErrorResponse response = new ErrorResponse(
-                "USER_HAS_TASKS",
-                ex.getMessage(),
-                LocalDateTime.now()
-        );
+  @ExceptionHandler(UserHasTasksException.class)
+  public ResponseEntity<ErrorResponse> handleUserHasTasks(UserHasTasksException ex) {
+    ErrorResponse response =
+        new ErrorResponse("USER_HAS_TASKS", ex.getMessage(), LocalDateTime.now());
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-    }
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+  }
 
-    @ExceptionHandler(ProcessingTaskNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleProcessingTaskNotFound(ProcessingTaskNotFoundException ex) {
-        ErrorResponse response = new ErrorResponse(
-                "PROCESSING_TASK_NOT_FOUND",
-                ex.getMessage(),
-                LocalDateTime.now()
-        );
+  @ExceptionHandler(ProcessingTaskNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleProcessingTaskNotFound(
+      ProcessingTaskNotFoundException ex) {
+    ErrorResponse response =
+        new ErrorResponse("PROCESSING_TASK_NOT_FOUND", ex.getMessage(), LocalDateTime.now());
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-    }
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+  }
 
-    @ExceptionHandler(InvalidAudioFileException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidAudioFile(InvalidAudioFileException ex) {
-        ErrorResponse response = new ErrorResponse(
-                "INVALID_AUDIO_FILE",
-                ex.getMessage(),
-                LocalDateTime.now()
-        );
+  @ExceptionHandler(InvalidAudioFileException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidAudioFile(InvalidAudioFileException ex) {
+    ErrorResponse response =
+        new ErrorResponse("INVALID_AUDIO_FILE", ex.getMessage(), LocalDateTime.now());
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-    }
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+  }
 
-    @ExceptionHandler(FileStorageException.class)
-    public ResponseEntity<ErrorResponse> handleFileStorage(FileStorageException ex) {
-        ErrorResponse response = new ErrorResponse(
-                "FILE_STORAGE_ERROR",
-                ex.getMessage(),
-                LocalDateTime.now()
-        );
+  @ExceptionHandler(FileStorageException.class)
+  public ResponseEntity<ErrorResponse> handleFileStorage(FileStorageException ex) {
+    ErrorResponse response =
+        new ErrorResponse("FILE_STORAGE_ERROR", ex.getMessage(), LocalDateTime.now());
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-    }
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+  }
 }

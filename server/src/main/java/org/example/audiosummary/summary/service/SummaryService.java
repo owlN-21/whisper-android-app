@@ -4,7 +4,9 @@ import org.example.audiosummary.entity.ProcessingTask;
 import org.example.audiosummary.summary.dto.SummaryResultResponse;
 
 public interface SummaryService {
-    void saveSummary(ProcessingTask task, String content);
-    void deleteByTaskId(Long taskId);
-    SummaryResultResponse getResultByTaskId(Long taskId);
+  void saveSummary(ProcessingTask task, String content);
+
+  void deleteByTaskId(Long taskId);
+
+  SummaryResultResponse getResultByTaskId(Long taskId);
 }

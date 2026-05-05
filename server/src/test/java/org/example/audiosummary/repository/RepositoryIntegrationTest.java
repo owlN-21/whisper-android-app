@@ -1,11 +1,10 @@
 package org.example.audiosummary.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
 //
-//@DataJpaTest
-//@ActiveProfiles("test")
-//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-//class RepositoryIntegrationTest {
+// @DataJpaTest
+// @ActiveProfiles("test")
+// @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+// class RepositoryIntegrationTest {
 //
 //    @Autowired
 //    private UserRepository userRepository;
@@ -58,8 +57,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 //
 //        Optional<User> foundUser = userRepository.findById(savedUser.getId());
 //        Optional<ProcessingTask> foundTask = processingTaskRepository.findById(savedTask.getId());
-//        Optional<Transcript> foundTranscript = transcriptRepository.findByProcessingTaskId(savedTask.getId());
-//        Optional<Summary> foundSummary = summaryRepository.findByProcessingTaskId(savedTask.getId());
+//        Optional<Transcript> foundTranscript =
+// transcriptRepository.findByProcessingTaskId(savedTask.getId());
+//        Optional<Summary> foundSummary =
+// summaryRepository.findByProcessingTaskId(savedTask.getId());
 //
 //        assertThat(foundUser).isPresent();
 //        assertThat(foundUser.get().getEmail()).isEqualTo("test@example.com");
@@ -71,7 +72,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 //
 //        assertThat(foundTranscript).isPresent();
 //        assertThat(foundTranscript.get().getText()).isEqualTo("Это текст транскрипции");
-//        assertThat(foundTranscript.get().getProcessingTask().getId()).isEqualTo(savedTask.getId());
+//
+// assertThat(foundTranscript.get().getProcessingTask().getId()).isEqualTo(savedTask.getId());
 //
 //        assertThat(foundSummary).isPresent();
 //        assertThat(foundSummary.get().getContent()).isEqualTo("Это структурированный конспект");
@@ -106,4 +108,4 @@ import static org.assertj.core.api.Assertions.assertThat;
 //        assertThat(tasks).isNotEmpty();
 //        assertThat(tasks.get(0).getStatus()).isEqualTo(TaskStatus.COMPLETED);
 //    }
-//}
+// }
