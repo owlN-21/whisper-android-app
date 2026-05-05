@@ -30,18 +30,6 @@ public class SummaryServiceImpl implements SummaryService {
     }
 
     @Override
-    public void createStubSummary(ProcessingTask task) {
-        Summary summary = new Summary();
-        summary.setProcessingTask(task);
-        task.setSummary(summary);
-        summary.setContent("Это временная заглушка summary. Processing-service пока не подключен.");
-        summary.setCreatedAt(LocalDateTime.now());
-
-        summaryRepository.save(summary);
-    }
-
-
-    @Override
     public void deleteByTaskId(Long taskId) {
         summaryRepository.deleteByProcessingTask_Id(taskId);
     }

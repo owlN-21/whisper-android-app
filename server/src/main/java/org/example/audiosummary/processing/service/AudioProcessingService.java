@@ -7,6 +7,7 @@ import org.example.audiosummary.processing.dto.SummaryResultResponse;
 import org.example.audiosummary.processing.dto.TranscriptionResultResponse;
 import org.example.audiosummary.processing.dto.status.ProcessingStatus;
 import org.example.audiosummary.summary.service.SummaryService;
+import org.example.audiosummary.transcript.service.TranscriptService;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
@@ -16,10 +17,12 @@ import java.time.LocalDateTime;
 public class AudioProcessingService {
     private final ProcessingServiceClient processingServiceClient;
     private final SummaryService summaryService;
+    private final TranscriptService transcriptService;
 
-    public AudioProcessingService(ProcessingServiceClient processingServiceClient, SummaryService summaryService) {
+    public AudioProcessingService(ProcessingServiceClient processingServiceClient, SummaryService summaryService, TranscriptService transcriptService) {
         this.processingServiceClient = processingServiceClient;
         this.summaryService = summaryService;
+        this.transcriptService = transcriptService;
     }
 
     public void startProcessing(ProcessingTask task) {
@@ -71,8 +74,11 @@ public class AudioProcessingService {
 
         if (response.status() == ProcessingStatus.COMPLETED) {
             String transcriptText = response.text();
+            transcriptService.saveTranscript(
+                    task,
+                    response.text()
+            );
 
-            // тут позже сохраним transcript в БД
 
             processingServiceClient.createSummary(
                     task.getId(),
