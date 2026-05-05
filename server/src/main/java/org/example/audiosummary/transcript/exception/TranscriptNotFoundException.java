@@ -1,7 +1,7 @@
 package org.example.audiosummary.transcript.exception;
 
 public class TranscriptNotFoundException extends RuntimeException {
-    public TranscriptNotFoundException(String message) {
-        super(message);
+    public TranscriptNotFoundException(Long taskId) {
+        super("Transcription not found for task id = " + taskId);
     }
 }

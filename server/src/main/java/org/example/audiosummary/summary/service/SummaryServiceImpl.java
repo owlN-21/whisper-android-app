@@ -2,7 +2,7 @@ package org.example.audiosummary.summary.service;
 
 import org.example.audiosummary.entity.ProcessingTask;
 import org.example.audiosummary.entity.Summary;
-import org.example.audiosummary.summary.dto.TaskResultResponse;
+import org.example.audiosummary.summary.dto.SummaryResultResponse;
 import org.example.audiosummary.summary.exception.SummaryNotFoundException;
 import org.example.audiosummary.summary.repository.SummaryRepository;
 import org.springframework.stereotype.Service;
@@ -47,11 +47,11 @@ public class SummaryServiceImpl implements SummaryService {
     }
 
     @Override
-    public TaskResultResponse getResultByTaskId(Long taskId) {
+    public SummaryResultResponse getResultByTaskId(Long taskId) {
         Summary summary = summaryRepository.findByProcessingTask_Id(taskId)
                 .orElseThrow(() -> new SummaryNotFoundException(taskId));
 
-        return new TaskResultResponse(
+        return new SummaryResultResponse(
                 summary.getProcessingTask().getId(),
                 summary.getProcessingTask().getStatus().name(),
                 summary.getContent()

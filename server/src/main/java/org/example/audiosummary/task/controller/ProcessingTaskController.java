@@ -1,6 +1,6 @@
 package org.example.audiosummary.task.controller;
 
-import org.example.audiosummary.summary.dto.TaskResultResponse;
+import org.example.audiosummary.summary.dto.SummaryResultResponse;
 import org.example.audiosummary.summary.service.SummaryService;
 import org.example.audiosummary.task.dto.ProcessingTaskResponse;
 import org.example.audiosummary.task.service.ProcessingTaskService;
@@ -46,7 +46,7 @@ public class ProcessingTaskController {
     }
 
     @GetMapping("/tasks/{taskId}/result")
-    public TaskResultResponse getTaskResult(@PathVariable Long taskId) {
+    public SummaryResultResponse getTaskResult(@PathVariable Long taskId) {
         return summaryService.getResultByTaskId(taskId);
     }
 
