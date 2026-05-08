@@ -36,7 +36,9 @@ public class AudioProcessingService {
 
     } catch (RuntimeException e) {
       task.setStatus(TaskStatus.FAILED);
-      task.setErrorMessage("Failed to start transcription: " + e.getMessage());
+      task.setErrorMessage(
+        "Сервис обработки временно недоступен. Попробуйте загрузить аудио позже."
+      );
       task.setUpdatedAt(LocalDateTime.now());
     }
   }
@@ -57,7 +59,7 @@ public class AudioProcessingService {
       }
     } catch (RuntimeException e) {
       task.setStatus(TaskStatus.FAILED);
-      task.setErrorMessage("Failed to check processing result: " + e.getMessage());
+      task.setErrorMessage("Не удалось получить результат обработки. Попробуйте повторить загрузку позже.");
       task.setUpdatedAt(LocalDateTime.now());
     }
   }
