@@ -515,11 +515,28 @@ GET `http://localhost:8080/api/tasks/{taskId}`
 `COMPLETED` → результат готов
 `FAILED` → ошибка, смотреть `errorMessage`
 
-4. Получить summary
+#### Чтобы transcript и summary подтянулись и сохранились в БД, нужно дергать GET /api/tasks/{taskId}.
+4. Получить transcript
+
+GET `http://localhost:8080/api/tasks/{taskId}/transcript`
+
+Этот endpoint возвращает распознанный текст аудиофайла, который main backend получил от processing-service и сохранил в таблицу `transcripts`.
+
+Пример ответа:
+
+{
+"taskId": 26,
+"status": "COMPLETED",
+"transcript": "Распознанный текст..."
+}
+
+Важно: transcript можно получить только после того, как он уже был сохранен в БД. Для этого нужно дергать `GET /api/tasks/{taskId}`, пока обработка не продвинется дальше транскрибации.
+
+5. Получить summary
 
 GET `http://localhost:8080/api/tasks/{taskId}/result`
 
-5. Удалить задачу
+6. Удалить задачу
 
 DELETE `http://localhost:8080/api/tasks/{taskId}`
 

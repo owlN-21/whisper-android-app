@@ -6,12 +6,10 @@ import org.example.audiosummary.entity.ProcessingTask;
 import org.example.audiosummary.entity.TaskStatus;
 import org.example.audiosummary.entity.User;
 import org.example.audiosummary.processing.service.AudioProcessingService;
-import org.example.audiosummary.summary.service.SummaryService;
 import org.example.audiosummary.task.dto.ProcessingTaskResponse;
 import org.example.audiosummary.task.exception.ProcessingTaskNotFoundException;
 import org.example.audiosummary.task.mapper.ProcessingTaskMapper;
 import org.example.audiosummary.task.repository.ProcessingTaskRepository;
-import org.example.audiosummary.transcript.service.TranscriptService;
 import org.example.audiosummary.user.exception.UserNotFoundException;
 import org.example.audiosummary.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -32,8 +30,6 @@ public class ProcessingTaskServiceImpl implements ProcessingTaskService {
             UserRepository userRepository,
             FileStorageService fileStorageService,
             ProcessingTaskMapper processingTaskMapper,
-            SummaryService summaryService,
-            TranscriptService transcriptService,
             AudioProcessingService audioProcessingService) {
         this.processingTaskRepository = processingTaskRepository;
         this.userRepository = userRepository;
