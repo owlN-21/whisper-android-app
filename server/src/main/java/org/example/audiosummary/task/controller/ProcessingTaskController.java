@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class ProcessingTaskController {
 
   private final ProcessingTaskService processingTaskService;

@@ -77,14 +77,15 @@ public class AudioProcessingService {
     }
 
     if (response.status() == ProcessingStatus.COMPLETED) {
-      String transcriptText = response.text();
-      transcriptService.saveTranscript(task, response.text());
+        String transcriptText = response.text();
+        transcriptService.saveTranscript(task, transcriptText);
 
-      processingServiceClient.createSummary(task.getId(), transcriptText);
+        processingServiceClient.createSummary(task.getId(), transcriptText);
 
-      task.setStatus(TaskStatus.SUMMARIZING);
-      task.setUpdatedAt(LocalDateTime.now());
-    }
+        task.setStatus(TaskStatus.SUMMARIZING);
+        task.setUpdatedAt(LocalDateTime.now());
+      }
+
   }
 
   private void checkSummary(ProcessingTask task) {
