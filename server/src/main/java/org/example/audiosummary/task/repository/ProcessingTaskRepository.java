@@ -14,6 +14,8 @@ public interface ProcessingTaskRepository extends JpaRepository<ProcessingTask, 
 
   List<ProcessingTask> findByStatus(TaskStatus status);
 
+  List<ProcessingTask> findByStatusIn(List<TaskStatus> statuses);
+
   @Query("select t.storagePath from ProcessingTask t where t.id = :taskId")
   Optional<String> findStoragePathById(Long taskId);
 

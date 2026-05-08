@@ -66,8 +66,6 @@ public class ProcessingTaskServiceImpl implements ProcessingTaskService {
                         .findById(taskId)
                         .orElseThrow(() -> new ProcessingTaskNotFoundException(taskId));
 
-        audioProcessingService.checkProcessingResult(task);
-
         return processingTaskMapper.toResponse(task);
     }
 
