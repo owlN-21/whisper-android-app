@@ -1,0 +1,41 @@
+app:
+  storage:
+    upload-dir: uploads
+
+  processing-service:
+    base-url: ${APP_PROCESSING_SERVICE_BASE_URL:http://localhost:8090}
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  application:
+    name: audio-summary-server
+  datasource:
+    url: jdbc:postgresql://postgres:5432/${APP_DB}
+    username: ${APP_USER}
+    password: ${APP_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+server:
+  port: 8080
+

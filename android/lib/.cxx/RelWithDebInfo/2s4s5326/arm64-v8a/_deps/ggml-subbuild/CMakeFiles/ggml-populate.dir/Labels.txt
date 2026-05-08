@@ -1,0 +1,14 @@
+# Target labels
+ ggml-populate
+# Source files and their labels
+D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/arm64-v8a/_deps/ggml-subbuild/CMakeFiles/ggml-populate
+D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/arm64-v8a/_deps/ggml-subbuild/CMakeFiles/ggml-populate.rule
+D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/arm64-v8a/_deps/ggml-subbuild/CMakeFiles/ggml-populate-complete.rule
+D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/arm64-v8a/_deps/ggml-subbuild/ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-build.rule
+D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/arm64-v8a/_deps/ggml-subbuild/ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-configure.rule
+D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/arm64-v8a/_deps/ggml-subbuild/ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-download.rule
+D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/arm64-v8a/_deps/ggml-subbuild/ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-install.rule
+D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/arm64-v8a/_deps/ggml-subbuild/ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-mkdir.rule
+D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/arm64-v8a/_deps/ggml-subbuild/ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-patch.rule
+D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/arm64-v8a/_deps/ggml-subbuild/ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-test.rule
+D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/arm64-v8a/_deps/ggml-subbuild/ggml-populate-prefix/src/ggml-populate-stamp/ggml-populate-update.rule

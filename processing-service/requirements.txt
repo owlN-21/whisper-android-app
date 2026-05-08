@@ -1,0 +1,9 @@
+faster-whisper
+pandas
+pyarrow
+matplotlib
+ollama
+fastapi
+uvicorn
+python-multipart
+httpx

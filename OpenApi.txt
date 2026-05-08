@@ -1,0 +1,405 @@
+openapi: 3.0.3
+info:
+  title: Audio Summary Main Backend API
+  version: 1.1.0
+  description: Current backend API for Android integration at the current development stage.
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+tags:
+  - name: Users
+    description: User management endpoints
+  - name: Tasks
+    description: Audio upload, task management and task result endpoints
+
+paths:
+  /api/v1/users:
+    post:
+      tags:
+        - Users
+      summary: Create user
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user by id
+      operationId: getUserById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          example: 1
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Users
+      summary: Delete user by id
+      operationId: deleteUserById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          example: 1
+      responses:
+        '204':
+          description: User deleted
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: User has related tasks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/users/by-email:
+    get:
+      tags:
+        - Users
+      summary: Get user by email
+      operationId: getUserByEmail
+      parameters:
+        - name: email
+          in: query
+          required: true
+          schema:
+            type: string
+            format: email
+          example: user@example.com
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/users/{userId}/tasks:
+    post:
+      tags:
+        - Tasks
+      summary: Upload audio and create processing task
+      operationId: uploadAudio
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadAudioRequest'
+      responses:
+        '201':
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessingTaskResponse'
+        '400':
+          description: Invalid request or invalid audio file
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: File storage error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      tags:
+        - Tasks
+      summary: Get all tasks by user id
+      operationId: getTasksByUserId
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: List of user tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProcessingTaskResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/tasks/{taskId}:
+    get:
+      tags:
+        - Tasks
+      summary: Get task by id
+      operationId: getTaskById
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '200':
+          description: Task found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessingTaskResponse'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Tasks
+      summary: Delete task by id
+      operationId: deleteTask
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '204':
+          description: Task deleted
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/tasks/{taskId}/result:
+    get:
+      tags:
+        - Tasks
+      summary: Get task result by task id
+      operationId: getTaskResult
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '200':
+          description: Task result found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResultResponse'
+        '404':
+          description: Task result not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  parameters:
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+      example: 1
+
+    TaskId:
+      name: taskId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+      example: 101
+
+  schemas:
+    CreateUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+      required:
+        - email
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        createdAt:
+          type: string
+          format: date-time
+          example: 2026-03-27T15:00:00
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2026-03-27T15:00:00
+      required:
+        - id
+        - email
+        - createdAt
+        - updatedAt
+
+    UploadAudioRequest:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+      required:
+        - file
+
+    ProcessingTaskResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 101
+        userId:
+          type: integer
+          format: int64
+          example: 1
+        originalFilename:
+          type: string
+          example: lecture-01.wav
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        errorMessage:
+          type: string
+          nullable: true
+          example: null
+        createdAt:
+          type: string
+          format: date-time
+          example: 2026-03-27T15:10:00
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2026-03-27T15:10:00
+      required:
+        - id
+        - userId
+        - originalFilename
+        - status
+        - createdAt
+        - updatedAt
+
+    TaskResultResponse:
+      type: object
+      properties:
+        taskId:
+          type: integer
+          format: int64
+          example: 101
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        summary:
+          type: string
+          example: Это временная заглушка summary. Processing-service пока не подключен.
+      required:
+        - taskId
+        - status
+        - summary
+
+    TaskStatus:
+      type: string
+      enum:
+        - CREATED
+        - UPLOADED
+        - TRANSCRIBING
+        - TRANSCRIBED
+        - SUMMARIZING
+        - COMPLETED
+        - FAILED
+      example: UPLOADED
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          example: USER_NOT_FOUND
+        message:
+          type: string
+          example: User with id=1 not found
+        timestamp:
+          type: string
+          format: date-time
+          example: 2026-03-27T15:30:00
+      required:
+        - code
+        - message
+        - timestamp
