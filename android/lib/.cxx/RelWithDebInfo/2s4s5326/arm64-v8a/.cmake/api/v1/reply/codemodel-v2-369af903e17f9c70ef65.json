@@ -1,0 +1,164 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-RelWithDebInfo-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.6.0"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						3,
+						4
+					]
+				},
+				{
+					"build" : "_deps/ggml-build",
+					"childIndexes" : 
+					[
+						2
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-_deps.ggml-build-RelWithDebInfo-b90f8d5283c71926d0ae.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "D:/diplom/WhisperAndroid/MyWhisperAndroidApp/third_party/whisper.cpp/ggml"
+				},
+				{
+					"build" : "_deps/ggml-build/src",
+					"childIndexes" : 
+					[
+						3
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-_deps.ggml-build.src-RelWithDebInfo-48ee73017700bf2a14fa.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "D:/diplom/WhisperAndroid/MyWhisperAndroidApp/third_party/whisper.cpp/ggml/src",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				},
+				{
+					"build" : "_deps/ggml-build/src/ggml-cpu",
+					"jsonFile" : "directory-_deps.ggml-build.src.ggml-cpu-RelWithDebInfo-30d1c615af4c44313f97.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 1,
+					"source" : "D:/diplom/WhisperAndroid/MyWhisperAndroidApp/third_party/whisper.cpp/ggml/src/ggml-cpu"
+				}
+			],
+			"name" : "RelWithDebInfo",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "whisper.cpp",
+					"targetIndexes" : 
+					[
+						3,
+						4
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1,
+						2,
+						3
+					],
+					"name" : "ggml",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 2,
+					"id" : "ggml::@13ca10ed1afff475bcb7",
+					"jsonFile" : "target-ggml-RelWithDebInfo-d03e7952060a33a9cbba.json",
+					"name" : "ggml",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ggml-base::@13ca10ed1afff475bcb7",
+					"jsonFile" : "target-ggml-base-RelWithDebInfo-c65368073ac8617224d0.json",
+					"name" : "ggml-base",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ggml-cpu::@13ca10ed1afff475bcb7",
+					"jsonFile" : "target-ggml-cpu-RelWithDebInfo-554f659d0050185fdb09.json",
+					"name" : "ggml-cpu",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "whisper::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-whisper-RelWithDebInfo-03e20a9b57d2389117d1.json",
+					"name" : "whisper",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "whisper_v8fp16_va::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-whisper_v8fp16_va-RelWithDebInfo-402b615869a4eedd7698.json",
+					"name" : "whisper_v8fp16_va",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/arm64-v8a",
+		"source" : "D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/src/main/jni/whisper"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}
