@@ -12,6 +12,8 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s 
+    networks:
+      - audio-summary-net
 
   processing-service:
     build: .
@@ -27,6 +29,12 @@ services:
       - ./data:/app/data
     entrypoint: ["uvicorn"]
     command: ["api.app:app", "--host", "0.0.0.0", "--port", "8090"]
+    networks:
+      - audio-summary-net
+
+networks:
+  audio-summary-net:
+    external: true
 
 volumes:
   ollama_data:

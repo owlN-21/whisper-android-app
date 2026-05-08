@@ -21,87 +21,80 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class ProcessingTaskServiceImpl implements ProcessingTaskService {
 
-  private final ProcessingTaskRepository processingTaskRepository;
-  private final UserRepository userRepository;
-  private final FileStorageService fileStorageService;
-  private final ProcessingTaskMapper processingTaskMapper;
-  private final SummaryService summaryService;
-  private final TranscriptService transcriptService;
-  private final AudioProcessingService audioProcessingService;
+    private final ProcessingTaskRepository processingTaskRepository;
+    private final UserRepository userRepository;
+    private final FileStorageService fileStorageService;
+    private final ProcessingTaskMapper processingTaskMapper;
+    private final AudioProcessingService audioProcessingService;
 
-  public ProcessingTaskServiceImpl(
-      ProcessingTaskRepository processingTaskRepository,
-      UserRepository userRepository,
-      FileStorageService fileStorageService,
-      ProcessingTaskMapper processingTaskMapper,
-      SummaryService summaryService,
-      TranscriptService transcriptService,
-      AudioProcessingService audioProcessingService) {
-    this.processingTaskRepository = processingTaskRepository;
-    this.userRepository = userRepository;
-    this.fileStorageService = fileStorageService;
-    this.processingTaskMapper = processingTaskMapper;
-    this.summaryService = summaryService;
-    this.transcriptService = transcriptService;
-    this.audioProcessingService = audioProcessingService;
-  }
-
-  @Override
-  @Transactional
-  public ProcessingTaskResponse uploadAudio(Long userId, MultipartFile file) {
-    User user =
-        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-
-    String originalFilename = file.getOriginalFilename();
-    String storagePath = fileStorageService.saveFile(file);
-
-    LocalDateTime now = LocalDateTime.now();
-
-    ProcessingTask task =
-        new ProcessingTask(
-            user, originalFilename, storagePath, TaskStatus.UPLOADED, null, now, now);
-
-    ProcessingTask savedTask = processingTaskRepository.save(task);
-    audioProcessingService.startProcessing(savedTask);
-    return processingTaskMapper.toResponse(savedTask);
-  }
-
-  @Override
-  @Transactional
-  public ProcessingTaskResponse getTaskById(Long taskId) {
-    ProcessingTask task =
-        processingTaskRepository
-            .findById(taskId)
-            .orElseThrow(() -> new ProcessingTaskNotFoundException(taskId));
-
-    audioProcessingService.checkProcessingResult(task);
-
-    return processingTaskMapper.toResponse(task);
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public List<ProcessingTaskResponse> getTasksByUserId(Long userId) {
-    if (!userRepository.existsById(userId)) {
-      throw new UserNotFoundException(userId);
+    public ProcessingTaskServiceImpl(
+            ProcessingTaskRepository processingTaskRepository,
+            UserRepository userRepository,
+            FileStorageService fileStorageService,
+            ProcessingTaskMapper processingTaskMapper,
+            SummaryService summaryService,
+            TranscriptService transcriptService,
+            AudioProcessingService audioProcessingService) {
+        this.processingTaskRepository = processingTaskRepository;
+        this.userRepository = userRepository;
+        this.fileStorageService = fileStorageService;
+        this.processingTaskMapper = processingTaskMapper;
+        this.audioProcessingService = audioProcessingService;
     }
 
-    return processingTaskRepository.findByUser_Id(userId).stream()
-        .map(processingTaskMapper::toResponse)
-        .toList();
-  }
+    @Override
+    @Transactional
+    public ProcessingTaskResponse uploadAudio(Long userId, MultipartFile file) {
+        User user =
+                userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
-  @Override
-  @Transactional
-  public void deleteTask(Long taskId) {
-    ProcessingTask task =
-        processingTaskRepository
-            .findById(taskId)
-            .orElseThrow(() -> new ProcessingTaskNotFoundException(taskId));
+        String originalFilename = file.getOriginalFilename();
+        String storagePath = fileStorageService.saveFile(file);
 
-    transcriptService.deleteByTaskId(taskId);
-    summaryService.deleteByTaskId(taskId);
-    fileStorageService.deleteFile(task.getStoragePath());
-    processingTaskRepository.delete(task);
-  }
+        LocalDateTime now = LocalDateTime.now();
+
+        ProcessingTask task =
+                new ProcessingTask(
+                        user, originalFilename, storagePath, TaskStatus.UPLOADED, null, now, now);
+
+        ProcessingTask savedTask = processingTaskRepository.save(task);
+        audioProcessingService.startProcessing(savedTask);
+        return processingTaskMapper.toResponse(savedTask);
+    }
+
+    @Override
+    @Transactional
+    public ProcessingTaskResponse getTaskById(Long taskId) {
+        ProcessingTask task =
+                processingTaskRepository
+                        .findById(taskId)
+                        .orElseThrow(() -> new ProcessingTaskNotFoundException(taskId));
+
+        audioProcessingService.checkProcessingResult(task);
+
+        return processingTaskMapper.toResponse(task);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProcessingTaskResponse> getTasksByUserId(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException(userId);
+        }
+
+        return processingTaskRepository.findByUser_Id(userId).stream()
+                .map(processingTaskMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public void deleteTask(Long taskId) {
+        String storagePath = processingTaskRepository.findStoragePathById(taskId)
+                .orElseThrow(() -> new ProcessingTaskNotFoundException(taskId));
+
+        processingTaskRepository.deleteTaskRowById(taskId);
+
+        fileStorageService.deleteFile(storagePath);
+    }
 }

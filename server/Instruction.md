@@ -476,3 +476,51 @@ select * from summaries;
 * запись должна быть удалена из таблицы `processing_tasks`
 * связанная запись в таблице `summaries` должна удалиться автоматически
 
+### Проверка обработки аудио через main backend
+
+1. Создать пользователя
+
+POST `http://localhost:8080/api/v1/users`
+
+Body → raw → JSON:
+
+```json
+{
+  "email": "test@example.com"
+}
+```
+
+2. Загрузить аудио
+
+POST `http://localhost:8080/api/users/{userId}/tasks`
+
+Body → form-data:
+
+key: `file`
+type: `File`
+value: выбрать `.mp3`, `.wav` или `.m4a`
+
+Важно: `taskId` и `model` сюда не передавать.
+
+3. Проверить статус задачи
+
+GET `http://localhost:8080/api/tasks/{taskId}`
+
+Повторять запрос, пока статус не станет `COMPLETED`.
+
+Статусы:
+
+`TRANSCRIBING` → идет транскрибация
+`SUMMARIZING` → идет суммаризация
+`COMPLETED` → результат готов
+`FAILED` → ошибка, смотреть `errorMessage`
+
+4. Получить summary
+
+GET `http://localhost:8080/api/tasks/{taskId}/result`
+
+5. Удалить задачу
+
+DELETE `http://localhost:8080/api/tasks/{taskId}`
+
+Коротко по логике: после `POST /api/users/{userId}/tasks` задача только запускается. Чтобы transcript и summary подтянулись и сохранились в БД, нужно дергать `GET /api/tasks/{taskId}`.

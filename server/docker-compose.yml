@@ -17,6 +17,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - audio-summary-net
 
   audiosummary:
     build: .
@@ -28,10 +30,17 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${APP_DB}
       SPRING_DATASOURCE_USERNAME: ${APP_USER}
       SPRING_DATASOURCE_PASSWORD: ${APP_PASSWORD}
+      APP_PROCESSING_SERVICE_BASE_URL: http://processing-service:8090
     ports:
       - "8080:8080"
     volumes:
       - app_uploads:/app/uploads
+    networks:
+      - audio-summary-net
+
+networks:
+  audio-summary-net:
+    external: true
 
 volumes:
   postgres_data:
