@@ -1,4 +1,0 @@
-D:\diplom\WhisperAndroid\MyWhisperAndroidApp\android\lib\src\main\jni\whisper\CMakeLists.txt
-D:\diplom\WhisperAndroid\MyWhisperAndroidApp\third_party\whisper.cpp\ggml\CMakeLists.txt
-D:\diplom\WhisperAndroid\MyWhisperAndroidApp\third_party\whisper.cpp\ggml\src\CMakeLists.txt
-D:\diplom\WhisperAndroid\MyWhisperAndroidApp\third_party\whisper.cpp\ggml\src\ggml-cpu\CMakeLists.txt
