@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,10 +18,14 @@ import com.example.lecture.ui.screens.loading.LoadingScreen
 import com.example.lecture.ui.screens.login.LoginScreen
 import com.example.lecture.ui.screens.login.LoginViewModel
 import com.example.lecture.ui.screens.main.MainScreen
+import com.example.lecture.ui.screens.main.MainViewModel
 import com.example.lecture.ui.screens.result.ResultScreen
 import com.example.lecture.ui.screens.settings.SettingsScreen
 import com.example.lecture.ui.screens.upload.AudioUploadScreen
 import kotlinx.coroutines.launch
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.example.lecture.ui.screens.main.MainViewModelFactory
 
 
 @Composable
@@ -96,12 +101,22 @@ fun AppNavGraph() {
         }
 
         composable(Screen.Main.route) {
+            val mainViewModel: MainViewModel = viewModel(
+                factory = MainViewModelFactory(
+                    userPreferencesRepository = app.userPreferencesRepository,
+                    taskDao = app.database.taskDao()
+                )
+            )
+
+            val mainUiState by mainViewModel.uiState.collectAsState()
+
             MainScreen(
+                uiState = mainUiState,
                 onUploadClick = {
                     navController.navigate(Screen.AudioUpload.route)
                 },
-                onOpenResultClick = {
-                    navController.navigate(Screen.Result.route)
+                onTaskClick = { taskId ->
+                    navController.navigate(Screen.Result.createRoute(taskId))
                 },
                 onSettingsClick = {
                     navController.navigate(Screen.Settings.route)
@@ -112,7 +127,7 @@ fun AppNavGraph() {
         composable(Screen.AudioUpload.route) {
             AudioUploadScreen(
                 onSendAudioClick = {
-                    navController.navigate(Screen.Result.route)
+                    navController.navigate(Screen.Main.route)
                 },
                 onBackClick = {
                     navController.navigate(Screen.Main.route)
@@ -123,7 +138,17 @@ fun AppNavGraph() {
             )
         }
 
-        composable(Screen.Result.route) {
+        composable(
+            route = Screen.Result.route,
+            arguments = listOf(
+                navArgument("taskId") {
+                    type = NavType.LongType
+                }
+            )
+        ) { backStackEntry ->
+
+            val taskId = backStackEntry.arguments?.getLong("taskId")
+
             ResultScreen(
                 onBackToMainClick = {
                     navController.navigate(Screen.Main.route)
