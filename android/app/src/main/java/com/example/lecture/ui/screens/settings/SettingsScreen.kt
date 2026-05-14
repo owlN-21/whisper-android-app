@@ -13,7 +13,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SettingsScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onLogoutClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -34,6 +35,12 @@ fun SettingsScreen(
             modifier = Modifier.padding(top = 24.dp)
         ) {
             Text("Назад")
+        }
+        Button(
+            onClick = onLogoutClick,
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Text("Выйти из аккаунта")
         }
     }
 }

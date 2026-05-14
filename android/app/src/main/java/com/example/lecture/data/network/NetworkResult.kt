@@ -10,6 +10,4 @@ sealed class NetworkResult<out T> {
         val message: String,
         val code: Int? = null
     ) : NetworkResult<Nothing>()
-
-    data object Loading : NetworkResult<Nothing>()
 }
