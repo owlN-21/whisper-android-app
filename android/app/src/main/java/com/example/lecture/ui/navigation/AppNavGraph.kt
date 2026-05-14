@@ -1,6 +1,9 @@
 package com.example.lecture.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
@@ -10,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.lecture.App
 import com.example.lecture.data.network.NetworkModule
 import com.example.lecture.data.repository.LoginRepository
+import com.example.lecture.ui.screens.loading.LoadingScreen
 import com.example.lecture.ui.screens.login.LoginScreen
 import com.example.lecture.ui.screens.login.LoginViewModel
 import com.example.lecture.ui.screens.main.MainScreen
@@ -18,6 +22,7 @@ import com.example.lecture.ui.screens.settings.SettingsScreen
 import com.example.lecture.ui.screens.upload.AudioUploadScreen
 import kotlinx.coroutines.launch
 
+
 @Composable
 fun AppNavGraph() {
     val navController = rememberNavController()
@@ -25,6 +30,10 @@ fun AppNavGraph() {
     val context = LocalContext.current
     val app = context.applicationContext as App
     val coroutineScope = rememberCoroutineScope()
+
+    val userPreferences by app.userPreferencesRepository.userPreferences.collectAsState(
+        initial = null
+    )
 
     val loginRepository = remember {
         LoginRepository(
@@ -41,8 +50,37 @@ fun AppNavGraph() {
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Login.route
+        startDestination = Screen.Loading.route
     ) {
+        composable(Screen.Loading.route) {
+            LoadingScreen()
+
+            LaunchedEffect(userPreferences) {
+                val preferences = userPreferences
+
+                if (preferences != null) {
+                    val isSessionValid =
+                        preferences.isLoggedIn &&
+                                preferences.userId != null &&
+                                !preferences.email.isNullOrBlank()
+
+                    val startRoute =
+                        if (isSessionValid) {
+                            Screen.Main.route
+                        } else {
+                            Screen.Login.route
+                        }
+
+                    navController.navigate(startRoute) {
+                        popUpTo(Screen.Loading.route) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            }
+        }
+
         composable(Screen.Login.route) {
             LoginScreen(
                 viewModel = loginViewModel,
@@ -51,6 +89,7 @@ fun AppNavGraph() {
                         popUpTo(Screen.Login.route) {
                             inclusive = true
                         }
+                        launchSingleTop = true
                     }
                 }
             )
@@ -108,7 +147,7 @@ fun AppNavGraph() {
                         app.userPreferencesRepository.clearUser()
 
                         navController.navigate(Screen.Login.route) {
-                            popUpTo(Screen.Main.route) {
+                            popUpTo(0) {
                                 inclusive = true
                             }
                             launchSingleTop = true
