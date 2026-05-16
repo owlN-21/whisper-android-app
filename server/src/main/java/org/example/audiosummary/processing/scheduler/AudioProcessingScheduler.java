@@ -24,6 +24,18 @@ public class AudioProcessingScheduler {
 
     @Scheduled(fixedDelayString = "${app.processing.scheduler-delay-ms:5000}")
     @Transactional
+    public void startUploadedTasks() {
+        List<ProcessingTask> tasks =
+                processingTaskRepository.findByStatusIn(
+                        List.of(TaskStatus.UPLOADED));
+
+        for (ProcessingTask task : tasks) {
+            audioProcessingService.startProcessing(task);
+        }
+    }
+
+    @Scheduled(fixedDelayString = "${app.processing.scheduler-delay-ms:5000}")
+    @Transactional
     public void processActiveTasks() {
         List<ProcessingTask> tasks =
                 processingTaskRepository.findByStatusIn(
