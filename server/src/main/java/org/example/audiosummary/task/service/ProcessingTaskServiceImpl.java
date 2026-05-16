@@ -54,7 +54,6 @@ public class ProcessingTaskServiceImpl implements ProcessingTaskService {
                         user, originalFilename, storagePath, TaskStatus.UPLOADED, null, now, now);
 
         ProcessingTask savedTask = processingTaskRepository.save(task);
-        audioProcessingService.startProcessing(savedTask);
         return processingTaskMapper.toResponse(savedTask);
     }
 
