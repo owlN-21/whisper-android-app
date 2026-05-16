@@ -25,7 +25,10 @@ import com.example.lecture.ui.screens.upload.AudioUploadScreen
 import kotlinx.coroutines.launch
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.lecture.data.repository.AudioUploadRepository
 import com.example.lecture.ui.screens.main.MainViewModelFactory
+import com.example.lecture.ui.screens.upload.AudioUploadViewModel
+import com.example.lecture.ui.screens.upload.AudioUploadViewModelFactory
 
 
 @Composable
@@ -125,12 +128,38 @@ fun AppNavGraph() {
         }
 
         composable(Screen.AudioUpload.route) {
+            val audioUploadRepository = remember {
+                AudioUploadRepository(
+                    contentResolver = context.contentResolver,
+                    apiService = NetworkModule.apiService
+                )
+            }
+
+            val audioUploadViewModel: AudioUploadViewModel = viewModel(
+                factory = AudioUploadViewModelFactory(
+                    userPreferencesRepository = app.userPreferencesRepository,
+                    audioUploadRepository = audioUploadRepository,
+                    taskDao = app.database.taskDao()
+                )
+            )
+
             AudioUploadScreen(
-                onSendAudioClick = {
-                    navController.navigate(Screen.Main.route)
+                viewModel = audioUploadViewModel,
+                onUploadSuccess = {
+                    navController.navigate(Screen.Main.route) {
+                        popUpTo(Screen.AudioUpload.route) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
                 },
                 onBackClick = {
-                    navController.navigate(Screen.Main.route)
+                    navController.navigate(Screen.Main.route) {
+                        popUpTo(Screen.AudioUpload.route) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
                 },
                 onSettingsClick = {
                     navController.navigate(Screen.Settings.route)

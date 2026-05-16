@@ -1,6 +1,8 @@
 package com.example.lecture.data.network
 
-import com.example.lecture.data.network.dto.CreateTaskRequestDto
+import okhttp3.MultipartBody
+import retrofit2.http.Multipart
+import retrofit2.http.Part
 import com.example.lecture.data.network.dto.CreateUserRequestDto
 import com.example.lecture.data.network.dto.HealthResponseDto
 import com.example.lecture.data.network.dto.SummaryDto
@@ -35,10 +37,11 @@ interface ApiService {
         @Path("userId") userId: Long
     ): Response<List<TaskDto>>
 
+    @Multipart
     @POST("/api/v1/users/{userId}/tasks")
     suspend fun createTask(
         @Path("userId") userId: Long,
-        @Body request: CreateTaskRequestDto
+        @Part file: MultipartBody.Part
     ): Response<TaskDto>
 
     @GET("/api/v1/tasks/{taskId}")

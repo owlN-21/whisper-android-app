@@ -14,8 +14,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -40,16 +42,15 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AudioUploadScreen(
-    onSendAudioClick: () -> Unit,
+    onUploadSuccess: () -> Unit,
     onBackClick: () -> Unit,
     onSettingsClick: () -> Unit,
-    viewModel: AudioUploadViewModel = viewModel()
+    viewModel: AudioUploadViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
 
     val audioPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
@@ -73,6 +74,21 @@ fun AudioUploadScreen(
         uiState.errorMessage?.let { message ->
             snackbarHostState.showSnackbar(message)
             viewModel.clearError()
+        }
+    }
+
+    LaunchedEffect(uiState.uploadErrorMessage) {
+        uiState.uploadErrorMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.clearUploadError()
+        }
+    }
+
+    LaunchedEffect(uiState.isUploadSuccessful) {
+        if (uiState.isUploadSuccessful) {
+            snackbarHostState.showSnackbar("Файл загружен")
+            viewModel.clearUploadSuccess()
+            onUploadSuccess()
         }
     }
 
@@ -113,7 +129,8 @@ fun AudioUploadScreen(
                                 "audio/*"
                             )
                         )
-                    }
+                    },
+                    enabled = !uiState.isUploading
                 ) {
                     Text("Выбрать аудиофайл")
                 }
@@ -133,23 +150,24 @@ fun AudioUploadScreen(
 
                 Button(
                     onClick = {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar(
-                                "Загрузка будет реализована на следующем этапе"
-                            )
-                        }
-
-                        // onSendAudioClick пока не вызываем,
-                        // потому что реальная загрузка еще не реализована.
+                        viewModel.uploadSelectedAudio()
                     },
-                    enabled = uiState.isFileSelected,
+                    enabled = uiState.isFileSelected && !uiState.isUploading,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Загрузить")
+                    if (uiState.isUploading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("Загрузить")
+                    }
                 }
 
                 OutlinedButton(
                     onClick = onBackClick,
+                    enabled = !uiState.isUploading,
                     modifier = Modifier.padding(top = 12.dp)
                 ) {
                     Text("На главный экран")
