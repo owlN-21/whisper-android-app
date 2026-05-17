@@ -31,7 +31,13 @@ class LoginViewModel(
     }
 
     fun onContinueClick() {
-        val email = uiState.value.email.trim()
+        val currentState = uiState.value
+
+        if (currentState.isLoading) {
+            return
+        }
+
+        val email = currentState.email.trim()
 
         if (email.isBlank()) {
             _uiState.update {
@@ -50,6 +56,7 @@ class LoginViewModel(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
+                    email = email,
                     isLoading = true,
                     errorMessage = null
                 )
@@ -58,6 +65,16 @@ class LoginViewModel(
             when (val result = loginRepository.loginOrRegister(email)) {
                 is NetworkResult.Success -> {
                     val user = result.data
+
+                    if (user.email.isBlank()) {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = "Сервер вернул некорректные данные пользователя"
+                            )
+                        }
+                        return@launch
+                    }
 
                     userPreferencesRepository.saveUser(
                         userId = user.id,
@@ -78,7 +95,7 @@ class LoginViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = result.message ?: "Не удалось подключиться к серверу"
+                            errorMessage = result.message
                         )
                     }
                 }
