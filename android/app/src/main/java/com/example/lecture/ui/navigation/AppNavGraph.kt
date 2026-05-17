@@ -186,29 +186,31 @@ fun AppNavGraph() {
                 factory = ResultViewModelFactory(
                     taskId = taskId,
                     summaryDao = app.database.summaryDao(),
-                    transcriptDao = app.database.transcriptDao()
+                    transcriptDao = app.database.transcriptDao(),
+                    taskDao = app.database.taskDao(),
+                    audioUploadRepository = AudioUploadRepository(
+                        contentResolver = context.contentResolver,
+                        apiService = NetworkModule.apiService
+                    )
                 )
             )
 
             ResultScreen(
                 viewModel = resultViewModel,
                 onBackToMainClick = {
-                    navController.navigate(Screen.Main.route) {
-                        popUpTo(Screen.Result.route) {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
-                    }
+                    navController.navigate(Screen.Main.route)
                 },
                 onSettingsClick = {
                     navController.navigate(Screen.Settings.route)
                 },
                 onUploadAnotherAudioClick = {
-                    navController.navigate(Screen.AudioUpload.route) {
-                        popUpTo(Screen.Result.route) {
-                            inclusive = true
+                    navController.navigate(Screen.AudioUpload.route)
+                },
+                onDeleted = {
+                    navController.navigate(Screen.Main.route) {
+                        popUpTo(Screen.Main.route) {
+                            inclusive = false
                         }
-                        launchSingleTop = true
                     }
                 }
             )

@@ -80,4 +80,24 @@ class AudioUploadRepository(
             apiService.getSummary(taskId)
         }
     }
+
+    suspend fun deleteTask(taskId: Long): NetworkResult<Unit> {
+        return try {
+            val response = apiService.deleteTask(taskId)
+
+            if (response.isSuccessful) {
+                NetworkResult.Success(Unit)
+            } else {
+                val errorBody = response.errorBody()?.string()
+
+                NetworkResult.Error(
+                    message = errorBody ?: "Ошибка удаления задачи: ${response.code()}"
+                )
+            }
+        } catch (e: Exception) {
+            NetworkResult.Error(
+                message = e.message ?: "Не удалось удалить задачу"
+            )
+        }
+    }
 }

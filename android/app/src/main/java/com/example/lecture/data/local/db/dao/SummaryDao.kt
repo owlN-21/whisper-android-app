@@ -20,4 +20,7 @@ interface SummaryDao {
         """
     )
     suspend fun getSummaryByTaskId(taskId: Long): SummaryEntity?
+
+    @Query("DELETE FROM summaries WHERE taskId = :taskId")
+    suspend fun deleteSummaryByTaskId(taskId: Long)
 }

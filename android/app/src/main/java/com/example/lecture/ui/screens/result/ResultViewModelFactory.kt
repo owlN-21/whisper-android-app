@@ -3,12 +3,17 @@ package com.example.lecture.ui.screens.result
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.lecture.data.local.db.dao.SummaryDao
+import com.example.lecture.data.local.db.dao.TaskDao
 import com.example.lecture.data.local.db.dao.TranscriptDao
+import com.example.lecture.data.repository.AudioUploadRepository
+
 
 class ResultViewModelFactory(
     private val taskId: Long,
     private val summaryDao: SummaryDao,
-    private val transcriptDao: TranscriptDao
+    private val transcriptDao: TranscriptDao,
+    private val taskDao: TaskDao,
+    private val audioUploadRepository: AudioUploadRepository
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -17,7 +22,9 @@ class ResultViewModelFactory(
             return ResultViewModel(
                 taskId = taskId,
                 summaryDao = summaryDao,
-                transcriptDao = transcriptDao
+                transcriptDao = transcriptDao,
+                taskDao = taskDao,
+                audioUploadRepository = audioUploadRepository
             ) as T
         }
 

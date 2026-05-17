@@ -20,4 +20,7 @@ interface TranscriptDao {
         """
     )
     suspend fun getTranscriptByTaskId(taskId: Long): TranscriptEntity?
+
+    @Query("DELETE FROM transcripts WHERE taskId = :taskId")
+    suspend fun deleteTranscriptByTaskId(taskId: Long)
 }
