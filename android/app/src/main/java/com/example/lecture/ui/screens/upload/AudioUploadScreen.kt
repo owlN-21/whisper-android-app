@@ -180,7 +180,6 @@ fun AudioUploadScreen(
 
                 OutlinedButton(
                     onClick = onBackClick,
-                    enabled = !uiState.isBusy,
                     modifier = Modifier.padding(top = 12.dp)
                 ) {
                     Text("На главный экран")

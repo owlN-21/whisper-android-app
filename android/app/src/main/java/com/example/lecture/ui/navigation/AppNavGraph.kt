@@ -107,10 +107,20 @@ fun AppNavGraph() {
         }
 
         composable(Screen.Main.route) {
+            val mainAudioUploadRepository = remember {
+                AudioUploadRepository(
+                    contentResolver = context.contentResolver,
+                    apiService = NetworkModule.apiService
+                )
+            }
+
             val mainViewModel: MainViewModel = viewModel(
                 factory = MainViewModelFactory(
                     userPreferencesRepository = app.userPreferencesRepository,
-                    taskDao = app.database.taskDao()
+                    taskDao = app.database.taskDao(),
+                    summaryDao = app.database.summaryDao(),
+                    transcriptDao = app.database.transcriptDao(),
+                    audioUploadRepository = mainAudioUploadRepository
                 )
             )
 

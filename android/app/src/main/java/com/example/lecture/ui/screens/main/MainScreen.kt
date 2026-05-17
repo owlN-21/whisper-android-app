@@ -25,11 +25,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.lecture.data.local.db.entity.TaskEntity
 import com.example.lecture.ui.components.SettingsButton
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
+private const val STATUS_COMPLETED = "COMPLETED"
+private const val STATUS_TRANSCRIBING = "TRANSCRIBING"
+private const val STATUS_SUMMARIZING = "SUMMARIZING"
+private const val STATUS_FAILED = "FAILED"
 
 @Composable
 fun MainScreen(
@@ -38,7 +44,6 @@ fun MainScreen(
     onTaskClick: (Long) -> Unit,
     onSettingsClick: () -> Unit
 ) {
-
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
@@ -60,71 +65,29 @@ fun MainScreen(
         ) {
             when {
                 uiState.isLoading -> {
-                    CircularProgressIndicator(
+                    LoadingState(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
 
                 uiState.errorMessage != null -> {
-                    Text(
-                        text = uiState.errorMessage,
-                        color = MaterialTheme.colorScheme.error,
+                    ErrorState(
+                        message = uiState.errorMessage,
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
 
                 else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 80.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        item {
-                            HeaderBlock(email = uiState.email)
-                        }
-
-                        item {
-                            UploadAudioCard(
-                                onClick = onUploadClick
-                            )
-                        }
-
-                        item {
-                            Text(
-                                text = "Последние конспекты",
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-
-                        if (uiState.isEmpty) {
-                            item {
-                                EmptyTasksBlock()
-                            }
-                        } else {
-                            items(uiState.tasks.size) { index ->
-                                val task = uiState.tasks[index]
-
-                                TaskCard(
-                                    fileName = task.originalFileName,
-                                    status = task.status,
-                                    summaryPreview = task.summaryPreview ?: "Конспект пока не создан",
-                                    updatedAt = task.updatedAt,
-                                    onClick = {
-                                        if (task.status == "COMPLETED") {
-                                            onTaskClick(task.id)
-                                        } else {
-                                            coroutineScope.launch {
-                                                snackbarHostState.showSnackbar(
-                                                    message = "Результат еще не готов"
-                                                )
-                                            }
-                                        }
-                                    }
-                                )
+                    MainContent(
+                        uiState = uiState,
+                        onUploadClick = onUploadClick,
+                        onTaskClick = onTaskClick,
+                        onShowMessage = { message ->
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(message = message)
                             }
                         }
-                    }
+                    )
                 }
             }
 
@@ -134,6 +97,123 @@ fun MainScreen(
             )
         }
     }
+}
+
+@Composable
+private fun MainContent(
+    uiState: MainUiState,
+    onUploadClick: () -> Unit,
+    onTaskClick: (Long) -> Unit,
+    onShowMessage: (String) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 80.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        item {
+            HeaderBlock(email = uiState.email)
+        }
+
+        item {
+            UploadAudioCard(
+                onClick = onUploadClick
+            )
+        }
+
+        item {
+            Text(
+                text = "Последние конспекты",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+
+        if (uiState.isEmpty) {
+            item {
+                EmptyTasksBlock()
+            }
+        } else {
+            items(uiState.tasks.size) { index ->
+                val task = uiState.tasks[index]
+
+                TaskCard(
+                    task = task,
+                    onClick = {
+                        handleTaskClick(
+                            task = task,
+                            onTaskClick = onTaskClick,
+                            onShowMessage = onShowMessage
+                        )
+                    }
+                )
+            }
+        }
+    }
+}
+
+private fun handleTaskClick(
+    task: TaskEntity,
+    onTaskClick: (Long) -> Unit,
+    onShowMessage: (String) -> Unit
+) {
+    when (task.status) {
+        STATUS_COMPLETED -> {
+            onTaskClick(task.id)
+        }
+
+        STATUS_TRANSCRIBING -> {
+            onShowMessage("Аудио еще распознается. Результат будет доступен позже")
+        }
+
+        STATUS_SUMMARIZING -> {
+            onShowMessage("Конспект еще создается. Результат будет доступен позже")
+        }
+
+        STATUS_FAILED -> {
+            val message = task.errorMessage
+                ?.takeIf { it.isNotBlank() }
+                ?: "Обработка задачи завершилась с ошибкой"
+
+            onShowMessage(message)
+        }
+
+        else -> {
+            onShowMessage("Задача еще не завершена. Текущий статус: ${task.status}")
+        }
+    }
+}
+
+@Composable
+private fun LoadingState(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator()
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Загрузка задач...",
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@Composable
+private fun ErrorState(
+    message: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = message,
+        color = MaterialTheme.colorScheme.error,
+        style = MaterialTheme.typography.bodyMedium,
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -214,12 +294,19 @@ private fun EmptyTasksBlock() {
 
 @Composable
 private fun TaskCard(
-    fileName: String,
-    status: String,
-    summaryPreview: String,
-    updatedAt: Long,
+    task: TaskEntity,
     onClick: () -> Unit
 ) {
+    val summaryPreview = when {
+        task.status == STATUS_FAILED -> task.errorMessage
+            ?.takeIf { it.isNotBlank() }
+            ?: "Обработка завершилась с ошибкой"
+
+        task.summaryPreview.isNullOrBlank() -> getStatusDescription(task.status)
+
+        else -> task.summaryPreview
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -231,13 +318,13 @@ private fun TaskCard(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = fileName,
+                text = task.originalFileName.ifBlank { "Аудиофайл без названия" },
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
 
             Text(
-                text = "Статус: $status",
+                text = "Статус: ${getStatusText(task.status)}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp)
@@ -248,15 +335,35 @@ private fun TaskCard(
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = 8.dp)
             )
+
             Text(
-                text = "Обновлено: ${formatDate(updatedAt)}",
+                text = "Обновлено: ${formatDate(task.updatedAt)}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 8.dp)
             )
         }
     }
+}
 
+private fun getStatusText(status: String): String {
+    return when (status) {
+        STATUS_COMPLETED -> "готово"
+        STATUS_TRANSCRIBING -> "распознавание аудио"
+        STATUS_SUMMARIZING -> "создание конспекта"
+        STATUS_FAILED -> "ошибка"
+        else -> status
+    }
+}
+
+private fun getStatusDescription(status: String): String {
+    return when (status) {
+        STATUS_COMPLETED -> "Конспект готов"
+        STATUS_TRANSCRIBING -> "Аудио распознается"
+        STATUS_SUMMARIZING -> "Конспект создается"
+        STATUS_FAILED -> "Обработка завершилась с ошибкой"
+        else -> "Задача еще обрабатывается"
+    }
 }
 
 private fun formatDate(timestamp: Long): String {
