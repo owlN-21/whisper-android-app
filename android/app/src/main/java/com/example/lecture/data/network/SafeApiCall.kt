@@ -1,7 +1,10 @@
 package com.example.lecture.data.network
 
+import com.example.lecture.data.network.dto.ErrorResponseDto
+import com.google.gson.Gson
 import retrofit2.Response
 import java.io.IOException
+import java.net.SocketTimeoutException
 
 suspend fun <T> safeApiCall(
     apiCall: suspend () -> Response<T>
@@ -16,23 +19,60 @@ suspend fun <T> safeApiCall(
                 NetworkResult.Success(body)
             } else {
                 NetworkResult.Error(
-                    message = "Empty response body",
+                    message = "Сервер вернул пустой ответ",
                     code = response.code()
                 )
             }
         } else {
             NetworkResult.Error(
-                message = response.errorBody()?.string() ?: "Unknown server error",
+                message = parseErrorMessage(response),
                 code = response.code()
             )
         }
+    } catch (exception: SocketTimeoutException) {
+        NetworkResult.Error(
+            message = "Превышено время ожидания ответа от сервера"
+        )
     } catch (exception: IOException) {
         NetworkResult.Error(
-            message = "Network error: ${exception.message}"
+            message = "Не удалось подключиться к серверу. Проверьте соединение или доступность backend"
         )
     } catch (exception: Exception) {
         NetworkResult.Error(
-            message = "Unexpected error: ${exception.message}"
+            message = exception.message ?: "Произошла неизвестная ошибка"
         )
+    }
+}
+
+private fun <T> parseErrorMessage(response: Response<T>): String {
+    val code = response.code()
+
+    val defaultMessage = when (code) {
+        400 -> "Некорректный запрос"
+        401 -> "Ошибка авторизации"
+        403 -> "Доступ запрещен"
+        404 -> "Данные не найдены"
+        408 -> "Превышено время ожидания запроса"
+        in 500..599 -> "Ошибка сервера. Попробуйте позже"
+        else -> "Ошибка запроса. Код: $code"
+    }
+
+    val errorBody = response.errorBody()?.string()
+
+    if (errorBody.isNullOrBlank()) {
+        return defaultMessage
+    }
+
+    return try {
+        val errorResponse = Gson().fromJson(errorBody, ErrorResponseDto::class.java)
+
+        when {
+            !errorResponse.message.isNullOrBlank() -> errorResponse.message
+            !errorResponse.error.isNullOrBlank() -> errorResponse.error
+            !errorResponse.code.isNullOrBlank() -> errorResponse.code
+            else -> defaultMessage
+        }
+    } catch (exception: Exception) {
+        defaultMessage
     }
 }
