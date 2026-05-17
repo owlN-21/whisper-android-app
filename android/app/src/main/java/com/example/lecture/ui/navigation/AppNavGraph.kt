@@ -28,7 +28,10 @@ import kotlinx.coroutines.launch
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.lecture.data.repository.AudioUploadRepository
+import com.example.lecture.data.repository.SettingsRepository
 import com.example.lecture.ui.screens.main.MainViewModelFactory
+import com.example.lecture.ui.screens.settings.SettingsViewModel
+import com.example.lecture.ui.screens.settings.SettingsViewModelFactory
 import com.example.lecture.ui.screens.upload.AudioUploadViewModel
 import com.example.lecture.ui.screens.upload.AudioUploadViewModelFactory
 
@@ -217,20 +220,32 @@ fun AppNavGraph() {
         }
 
         composable(Screen.Settings.route) {
+            val context = LocalContext.current
+            val app = context.applicationContext as App
+
+            val settingsRepository = remember {
+                SettingsRepository(NetworkModule.apiService)
+            }
+
+            val settingsViewModel: SettingsViewModel = viewModel(
+                factory = SettingsViewModelFactory(
+                    userPreferencesRepository = app.userPreferencesRepository,
+                    settingsRepository = settingsRepository,
+                    baseUrl = NetworkModule.BASE_URL
+                )
+            )
+
             SettingsScreen(
+                viewModel = settingsViewModel,
                 onBackClick = {
                     navController.popBackStack()
                 },
-                onLogoutClick = {
-                    coroutineScope.launch {
-                        app.userPreferencesRepository.clearUser()
-
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(0) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
+                onLogout = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) {
+                            inclusive = true
                         }
+                        launchSingleTop = true
                     }
                 }
             )
