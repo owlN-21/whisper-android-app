@@ -24,7 +24,6 @@ import com.example.lecture.ui.screens.settings.SettingsScreen
 import com.example.lecture.ui.screens.upload.AudioUploadScreen
 import com.example.lecture.ui.screens.result.ResultViewModel
 import com.example.lecture.ui.screens.result.ResultViewModelFactory
-import kotlinx.coroutines.launch
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.lecture.data.repository.AudioUploadRepository
@@ -42,7 +41,6 @@ fun AppNavGraph() {
 
     val context = LocalContext.current
     val app = context.applicationContext as App
-    val coroutineScope = rememberCoroutineScope()
 
     val userPreferences by app.userPreferencesRepository.userPreferences.collectAsState(
         initial = null
