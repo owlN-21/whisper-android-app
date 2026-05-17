@@ -8,7 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +20,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -30,19 +28,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.lecture.ui.components.SettingsButton
-import kotlinx.coroutines.launch
 
 @Composable
 fun AudioUploadScreen(
-    onUploadSuccess: () -> Unit,
+    onResultReady: (Long) -> Unit,
     onBackClick: () -> Unit,
     onSettingsClick: () -> Unit,
     viewModel: AudioUploadViewModel
@@ -84,11 +79,23 @@ fun AudioUploadScreen(
         }
     }
 
+    LaunchedEffect(uiState.processingErrorMessage) {
+        uiState.processingErrorMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.clearProcessingError()
+        }
+    }
+
     LaunchedEffect(uiState.isUploadSuccessful) {
         if (uiState.isUploadSuccessful) {
             snackbarHostState.showSnackbar("Файл загружен")
             viewModel.clearUploadSuccess()
-            onUploadSuccess()
+        }
+    }
+
+    LaunchedEffect(uiState.completedLocalTaskId) {
+        uiState.completedLocalTaskId?.let { localTaskId ->
+            onResultReady(localTaskId)
         }
     }
 
@@ -130,7 +137,7 @@ fun AudioUploadScreen(
                             )
                         )
                     },
-                    enabled = !uiState.isUploading
+                    enabled = !uiState.isBusy
                 ) {
                     Text("Выбрать аудиофайл")
                 }
@@ -146,13 +153,19 @@ fun AudioUploadScreen(
                     )
                 }
 
+                if (uiState.isUploading || uiState.isProcessing) {
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    ProcessingStateCard(uiState = uiState)
+                }
+
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
                     onClick = {
                         viewModel.uploadSelectedAudio()
                     },
-                    enabled = uiState.isFileSelected && !uiState.isUploading,
+                    enabled = uiState.isFileSelected && !uiState.isBusy,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     if (uiState.isUploading) {
@@ -167,7 +180,7 @@ fun AudioUploadScreen(
 
                 OutlinedButton(
                     onClick = onBackClick,
-                    enabled = !uiState.isUploading,
+                    enabled = !uiState.isBusy,
                     modifier = Modifier.padding(top = 12.dp)
                 ) {
                     Text("На главный экран")
@@ -210,6 +223,47 @@ private fun SelectedAudioFileCard(
                 text = "Uri: ${uiState.selectedUri}",
                 style = MaterialTheme.typography.bodySmall
             )
+        }
+    }
+}
+
+@Composable
+private fun ProcessingStateCard(
+    uiState: AudioUploadUiState
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(32.dp),
+                strokeWidth = 3.dp
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = uiState.processingMessage
+                    ?: if (uiState.isUploading) {
+                        "Загружаем файл..."
+                    } else {
+                        "Обрабатываем аудио..."
+                    },
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium
+            )
+
+            uiState.processingStatus?.let { status ->
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Статус: $status",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }

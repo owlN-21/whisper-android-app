@@ -22,6 +22,8 @@ import com.example.lecture.ui.screens.main.MainViewModel
 import com.example.lecture.ui.screens.result.ResultScreen
 import com.example.lecture.ui.screens.settings.SettingsScreen
 import com.example.lecture.ui.screens.upload.AudioUploadScreen
+import com.example.lecture.ui.screens.result.ResultViewModel
+import com.example.lecture.ui.screens.result.ResultViewModelFactory
 import kotlinx.coroutines.launch
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -139,14 +141,16 @@ fun AppNavGraph() {
                 factory = AudioUploadViewModelFactory(
                     userPreferencesRepository = app.userPreferencesRepository,
                     audioUploadRepository = audioUploadRepository,
-                    taskDao = app.database.taskDao()
+                    taskDao = app.database.taskDao(),
+                    summaryDao = app.database.summaryDao(),
+                    transcriptDao = app.database.transcriptDao()
                 )
             )
 
             AudioUploadScreen(
                 viewModel = audioUploadViewModel,
-                onUploadSuccess = {
-                    navController.navigate(Screen.Main.route) {
+                onResultReady = { localTaskId ->
+                    navController.navigate(Screen.Result.createRoute(localTaskId)) {
                         popUpTo(Screen.AudioUpload.route) {
                             inclusive = true
                         }
@@ -176,17 +180,36 @@ fun AppNavGraph() {
             )
         ) { backStackEntry ->
 
-            val taskId = backStackEntry.arguments?.getLong("taskId")
+            val taskId = backStackEntry.arguments?.getLong("taskId") ?: return@composable
+
+            val resultViewModel: ResultViewModel = viewModel(
+                factory = ResultViewModelFactory(
+                    taskId = taskId,
+                    summaryDao = app.database.summaryDao(),
+                    transcriptDao = app.database.transcriptDao()
+                )
+            )
 
             ResultScreen(
+                viewModel = resultViewModel,
                 onBackToMainClick = {
-                    navController.navigate(Screen.Main.route)
+                    navController.navigate(Screen.Main.route) {
+                        popUpTo(Screen.Result.route) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
                 },
                 onSettingsClick = {
                     navController.navigate(Screen.Settings.route)
                 },
                 onUploadAnotherAudioClick = {
-                    navController.navigate(Screen.AudioUpload.route)
+                    navController.navigate(Screen.AudioUpload.route) {
+                        popUpTo(Screen.Result.route) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
                 }
             )
         }

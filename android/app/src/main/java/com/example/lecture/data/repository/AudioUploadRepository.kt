@@ -4,7 +4,9 @@ import android.content.ContentResolver
 import android.net.Uri
 import com.example.lecture.data.network.ApiService
 import com.example.lecture.data.network.NetworkResult
+import com.example.lecture.data.network.dto.SummaryDto
 import com.example.lecture.data.network.dto.TaskDto
+import com.example.lecture.data.network.dto.TranscriptDto
 import com.example.lecture.data.network.safeApiCall
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -52,6 +54,30 @@ class AudioUploadRepository(
             NetworkResult.Error(
                 message = "Не удалось подготовить файл к загрузке: ${exception.message}"
             )
+        }
+    }
+
+    suspend fun getTaskStatus(
+        taskId: Long
+    ): NetworkResult<TaskDto> {
+        return safeApiCall {
+            apiService.getTask(taskId)
+        }
+    }
+
+    suspend fun getTranscript(
+        taskId: Long
+    ): NetworkResult<TranscriptDto> {
+        return safeApiCall {
+            apiService.getTranscript(taskId)
+        }
+    }
+
+    suspend fun getSummary(
+        taskId: Long
+    ): NetworkResult<SummaryDto> {
+        return safeApiCall {
+            apiService.getSummary(taskId)
         }
     }
 }
