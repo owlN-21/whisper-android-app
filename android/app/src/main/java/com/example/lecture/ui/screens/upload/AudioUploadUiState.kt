@@ -22,7 +22,11 @@ data class AudioUploadUiState(
     val completedLocalTaskId: Long? = null
 ) {
     val isFileSelected: Boolean
-        get() = selectedUri != null && errorMessage == null
+        get() = !selectedUri.isNullOrBlank() &&
+                !selectedFileName.isNullOrBlank() &&
+                selectedFileSizeBytes != null &&
+                selectedFileSizeBytes > 0L &&
+                errorMessage == null
 
     val isBusy: Boolean
         get() = isUploading || isProcessing

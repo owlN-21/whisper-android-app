@@ -277,39 +277,47 @@ private fun getAudioFileInfo(
     context: Context,
     uri: Uri
 ): AudioFileInfo {
-    val contentResolver = context.contentResolver
+    return try {
+        val contentResolver = context.contentResolver
 
-    val mimeType = contentResolver.getType(uri)
+        val mimeType = contentResolver.getType(uri)
 
-    var fileName: String? = null
-    var fileSizeBytes: Long? = null
+        var fileName: String? = null
+        var fileSizeBytes: Long? = null
 
-    contentResolver.query(
-        uri,
-        null,
-        null,
-        null,
-        null
-    )?.use { cursor ->
-        val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-        val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+        contentResolver.query(
+            uri,
+            null,
+            null,
+            null,
+            null
+        )?.use { cursor ->
+            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
 
-        if (cursor.moveToFirst()) {
-            if (nameIndex != -1) {
-                fileName = cursor.getString(nameIndex)
-            }
+            if (cursor.moveToFirst()) {
+                if (nameIndex != -1) {
+                    fileName = cursor.getString(nameIndex)
+                }
 
-            if (sizeIndex != -1 && !cursor.isNull(sizeIndex)) {
-                fileSizeBytes = cursor.getLong(sizeIndex)
+                if (sizeIndex != -1 && !cursor.isNull(sizeIndex)) {
+                    fileSizeBytes = cursor.getLong(sizeIndex)
+                }
             }
         }
-    }
 
-    return AudioFileInfo(
-        fileName = fileName,
-        fileSizeBytes = fileSizeBytes,
-        mimeType = mimeType
-    )
+        AudioFileInfo(
+            fileName = fileName,
+            fileSizeBytes = fileSizeBytes,
+            mimeType = mimeType
+        )
+    } catch (exception: Exception) {
+        AudioFileInfo(
+            fileName = null,
+            fileSizeBytes = null,
+            mimeType = null
+        )
+    }
 }
 
 private fun formatFileSize(

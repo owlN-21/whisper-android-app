@@ -210,7 +210,7 @@ class MainViewModel(
                             STATUS_FAILED -> {
                                 taskDao.updateTaskError(
                                     taskId = localTaskId,
-                                    errorMessage = "Backend сообщил, что обработка задачи завершилась с ошибкой",
+                                    errorMessage = "Обработка аудио завершилась с ошибкой. Попробуйте загрузить файл еще раз",
                                     status = STATUS_FAILED
                                 )
                             }

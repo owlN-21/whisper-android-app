@@ -18,6 +18,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+private const val STATUS_UPLOADED = "UPLOADED"
+private const val STATUS_TRANSCRIBING = "TRANSCRIBING"
+private const val STATUS_SUMMARIZING = "SUMMARIZING"
+private const val STATUS_COMPLETED = "COMPLETED"
+private const val STATUS_FAILED = "FAILED"
 class AudioUploadViewModel(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val audioUploadRepository: AudioUploadRepository,
@@ -35,6 +40,13 @@ class AudioUploadViewModel(
         mimeType: String?,
         uri: String
     ) {
+        if (uri.isBlank()) {
+            _uiState.value = AudioUploadUiState(
+                errorMessage = "Не удалось получить путь к файлу"
+            )
+            return
+        }
+
         if (fileName.isNullOrBlank()) {
             _uiState.value = AudioUploadUiState(
                 errorMessage = "Не удалось получить имя файла"
@@ -77,11 +89,15 @@ class AudioUploadViewModel(
     fun uploadSelectedAudio() {
         val currentState = _uiState.value
 
+        if (currentState.isBusy) {
+            return
+        }
+
         val selectedUri = currentState.selectedUri
         val selectedFileName = currentState.selectedFileName
         val selectedMimeType = currentState.selectedMimeType
 
-        if (selectedUri == null || selectedFileName == null) {
+        if (selectedUri.isNullOrBlank() || selectedFileName.isNullOrBlank()) {
             _uiState.value = currentState.copy(
                 uploadErrorMessage = "Сначала выберите аудиофайл"
             )
@@ -120,12 +136,14 @@ class AudioUploadViewModel(
                     val taskDto = uploadResult.data
                     val now = System.currentTimeMillis()
 
+                    val taskStatus = taskDto.status.ifBlank { STATUS_UPLOADED }
+
                     val localTask = TaskEntity(
                         remoteTaskId = taskDto.id,
                         userId = userId,
                         originalFileName = taskDto.fileName ?: selectedFileName,
                         localFileUri = selectedUri,
-                        status = taskDto.status,
+                        status = taskStatus,
                         errorMessage = null,
                         summaryPreview = null,
                         createdAt = now,
@@ -140,8 +158,8 @@ class AudioUploadViewModel(
                         uploadedTaskId = taskDto.id,
                         isUploadSuccessful = true,
                         uploadErrorMessage = null,
-                        processingStatus = taskDto.status,
-                        processingMessage = getProcessingMessage(taskDto.status)
+                        processingStatus = taskStatus,
+                        processingMessage = getProcessingMessage(taskStatus)
                     )
 
                     pollTaskStatus(
@@ -171,7 +189,7 @@ class AudioUploadViewModel(
             when (statusResult) {
                 is NetworkResult.Success -> {
                     val taskDto = statusResult.data
-                    val status = taskDto.status
+                    val status = taskDto.status.ifBlank { STATUS_UPLOADED }
 
                     taskDao.updateTaskStatus(
                         taskId = localTaskId,
@@ -186,7 +204,7 @@ class AudioUploadViewModel(
                     )
 
                     when (status) {
-                        "COMPLETED" -> {
+                        STATUS_COMPLETED -> {
                             loadAndSaveResult(
                                 remoteTaskId = remoteTaskId,
                                 localTaskId = localTaskId
@@ -194,12 +212,13 @@ class AudioUploadViewModel(
                             return
                         }
 
-                        "FAILED" -> {
-                            val errorMessage = "Backend не смог обработать аудио"
+                        STATUS_FAILED -> {
+                            val errorMessage = "Обработка аудио завершилась с ошибкой. Попробуйте загрузить файл еще раз"
 
                             taskDao.updateTaskError(
                                 taskId = localTaskId,
-                                errorMessage = errorMessage
+                                errorMessage = errorMessage,
+                                status = STATUS_FAILED
                             )
 
                             _uiState.value = _uiState.value.copy(
@@ -213,13 +232,8 @@ class AudioUploadViewModel(
                 }
 
                 is NetworkResult.Error -> {
-                    val errorMessage = statusResult.message
-
-                    taskDao.updateTaskError(
-                        taskId = localTaskId,
-                        errorMessage = errorMessage,
-                        status = "FAILED"
-                    )
+                    val errorMessage =
+                        "Не удалось обновить статус обработки. Задача останется на главном экране и продолжит обновляться позже"
 
                     _uiState.value = _uiState.value.copy(
                         isProcessing = false,
@@ -250,7 +264,7 @@ class AudioUploadViewModel(
             taskDao.updateTaskError(
                 taskId = localTaskId,
                 errorMessage = errorMessage,
-                status = "COMPLETED"
+                status = STATUS_FAILED
             )
 
             _uiState.value = _uiState.value.copy(
@@ -269,7 +283,7 @@ class AudioUploadViewModel(
             taskDao.updateTaskError(
                 taskId = localTaskId,
                 errorMessage = errorMessage,
-                status = "COMPLETED"
+                status = STATUS_FAILED
             )
 
             _uiState.value = _uiState.value.copy(
@@ -286,12 +300,12 @@ class AudioUploadViewModel(
         val transcriptText = transcript.transcript
 
         if (transcriptText.isNullOrBlank()) {
-            val errorMessage = "Backend вернул пустую расшифровку"
+            val errorMessage = "Сервер вернул пустую расшифровку. Проверьте аудиофайл и попробуйте снова"
 
             taskDao.updateTaskError(
                 taskId = localTaskId,
                 errorMessage = errorMessage,
-                status = "COMPLETED"
+                status = STATUS_FAILED
             )
 
             _uiState.value = _uiState.value.copy(
@@ -305,12 +319,12 @@ class AudioUploadViewModel(
         val summaryText = summary.summary
 
         if (summaryText.isNullOrBlank()) {
-            val errorMessage = "Backend вернул пустой конспект"
+            val errorMessage = "Сервер вернул пустой конспект. Попробуйте загрузить файл еще раз"
 
             taskDao.updateTaskError(
                 taskId = localTaskId,
                 errorMessage = errorMessage,
-                status = "COMPLETED"
+                status = STATUS_FAILED
             )
 
             _uiState.value = _uiState.value.copy(
@@ -337,7 +351,7 @@ class AudioUploadViewModel(
 
         taskDao.updateTaskStatus(
             taskId = localTaskId,
-            status = "COMPLETED"
+            status = STATUS_COMPLETED
         )
 
         taskDao.updateSummaryPreview(
@@ -345,19 +359,9 @@ class AudioUploadViewModel(
             summaryPreview = createSummaryPreview(summaryText)
         )
 
-        taskDao.updateTaskStatus(
-            taskId = localTaskId,
-            status = "COMPLETED"
-        )
-
-        taskDao.updateSummaryPreview(
-            taskId = localTaskId,
-            summaryPreview = createSummaryPreview(summary.summary)
-        )
-
         _uiState.value = _uiState.value.copy(
             isProcessing = false,
-            processingStatus = "COMPLETED",
+            processingStatus = STATUS_COMPLETED,
             processingMessage = "Готово",
             processingErrorMessage = null,
             completedLocalTaskId = localTaskId
@@ -412,11 +416,11 @@ class AudioUploadViewModel(
 
     private fun getProcessingMessage(status: String?): String {
         return when (status) {
-            "UPLOADED" -> "Файл загружен. Ожидаем начала обработки..."
-            "TRANSCRIBING" -> "Распознаем аудио..."
-            "SUMMARIZING" -> "Создаем конспект..."
-            "COMPLETED" -> "Обработка завершена"
-            "FAILED" -> "Ошибка обработки"
+            STATUS_UPLOADED -> "Файл загружен. Ожидаем начала обработки..."
+            STATUS_TRANSCRIBING -> "Распознаем аудио..."
+            STATUS_SUMMARIZING -> "Создаем конспект..."
+            STATUS_COMPLETED -> "Обработка завершена"
+            STATUS_FAILED -> "Ошибка обработки"
             else -> "Обрабатываем аудио..."
         }
     }
