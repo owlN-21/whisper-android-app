@@ -14,11 +14,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -32,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.lecture.ui.components.SettingsButton
 
@@ -110,17 +114,36 @@ fun AudioUploadScreen(
                 .padding(paddingValues)
                 .padding(24.dp)
         ) {
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier.align(Alignment.TopStart)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "На главный экран"
+                )
+            }
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 48.dp),
+                    .padding(top = 56.dp, bottom = 72.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Выбор аудиофайла",
+                    text = "Создать конспект",
                     style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Выберите аудиофайл, а приложение распознает речь и подготовит структурированный конспект",
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -139,7 +162,7 @@ fun AudioUploadScreen(
                     },
                     enabled = !uiState.isBusy
                 ) {
-                    Text("Выбрать аудиофайл")
+                    Text("Выбрать файл")
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -148,8 +171,9 @@ fun AudioUploadScreen(
                     SelectedAudioFileCard(uiState = uiState)
                 } else {
                     Text(
-                        text = "Файл пока не выбран",
-                        style = MaterialTheme.typography.bodyMedium
+                        text = "Выберите файл, чтобы продолжить",
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center
                     )
                 }
 
@@ -165,8 +189,7 @@ fun AudioUploadScreen(
                     onClick = {
                         viewModel.uploadSelectedAudio()
                     },
-                    enabled = uiState.isFileSelected && !uiState.isBusy,
-                    modifier = Modifier.fillMaxWidth()
+                    enabled = uiState.isFileSelected && !uiState.isBusy
                 ) {
                     if (uiState.isUploading) {
                         CircularProgressIndicator(
@@ -174,15 +197,8 @@ fun AudioUploadScreen(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Загрузить")
+                        Text("Создать")
                     }
-                }
-
-                OutlinedButton(
-                    onClick = onBackClick,
-                    modifier = Modifier.padding(top = 12.dp)
-                ) {
-                    Text("На главный экран")
                 }
             }
 
@@ -205,22 +221,26 @@ private fun SelectedAudioFileCard(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "Выбранный файл",
+                text = "Файл готов к загрузке",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text("Название: ${uiState.selectedFileName}")
-            Text("Размер: ${formatFileSize(uiState.selectedFileSizeBytes)}")
-            Text("MIME type: ${uiState.selectedMimeType ?: "Неизвестно"}")
-
-            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = "Файл: ${uiState.selectedFileName}",
+                style = MaterialTheme.typography.bodyMedium
+            )
 
             Text(
-                text = "Uri: ${uiState.selectedUri}",
-                style = MaterialTheme.typography.bodySmall
+                text = "Размер: ${formatFileSize(uiState.selectedFileSizeBytes)}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Text(
+                text = "Формат: ${uiState.selectedMimeType ?: "Неизвестно"}",
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
@@ -234,7 +254,9 @@ private fun ProcessingStateCard(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             CircularProgressIndicator(
@@ -251,8 +273,10 @@ private fun ProcessingStateCard(
                     } else {
                         "Обрабатываем аудио..."
                     },
+                modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center
             )
 
             uiState.processingStatus?.let { status ->
@@ -260,7 +284,9 @@ private fun ProcessingStateCard(
 
                 Text(
                     text = "Статус: $status",
-                    style = MaterialTheme.typography.bodySmall
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center
                 )
             }
         }

@@ -1,19 +1,28 @@
 package com.example.lecture.ui.screens.result
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -89,7 +98,6 @@ fun ResultScreen(
                     ResultContent(
                         uiState = uiState,
                         onBackToMainClick = onBackToMainClick,
-                        onUploadAnotherAudioClick = onUploadAnotherAudioClick,
                         onDeleteClick = {
                             showDeleteDialog = true
                         }
@@ -125,9 +133,6 @@ fun ResultScreen(
             },
             title = {
                 Text("Удалить этот конспект?")
-            },
-            text = {
-                Text("Это действие нельзя будет отменить.")
             },
             confirmButton = {
                 TextButton(
@@ -209,20 +214,35 @@ private fun ErrorState(
 private fun ResultContent(
     uiState: ResultUiState,
     onBackToMainClick: () -> Unit,
-    onUploadAnotherAudioClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 48.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        Text(
-            text = "Результат обработки",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Назад",
+                modifier = Modifier
+                    .clickable(
+                        enabled = !uiState.isDeleting,
+                        onClick = onBackToMainClick
+                    )
+                    .size(28.dp)
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Text(
+                text = "Результат обработки",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -240,30 +260,10 @@ private fun ResultContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(
-            onClick = onBackToMainClick,
-            enabled = !uiState.isDeleting,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("На главный экран")
-        }
-
-        OutlinedButton(
-            onClick = onUploadAnotherAudioClick,
-            enabled = !uiState.isDeleting,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp)
-        ) {
-            Text("Загрузить другое аудио")
-        }
-
         OutlinedButton(
             onClick = onDeleteClick,
             enabled = !uiState.isDeleting,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
             if (uiState.isDeleting) {
                 CircularProgressIndicator()
