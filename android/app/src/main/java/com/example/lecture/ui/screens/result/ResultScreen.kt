@@ -72,109 +72,45 @@ fun ResultScreen(
         ) {
             when {
                 uiState.isLoading -> {
-                    CircularProgressIndicator(
+                    LoadingState(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
 
                 uiState.errorMessage != null -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 48.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Не удалось открыть результат",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
+                    ErrorState(
+                        message = uiState.errorMessage.orEmpty(),
+                        onBackToMainClick = onBackToMainClick,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
 
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Text(text = uiState.errorMessage ?: "Неизвестная ошибка")
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        Button(onClick = onBackToMainClick) {
-                            Text("На главный экран")
+                uiState.hasResult -> {
+                    ResultContent(
+                        uiState = uiState,
+                        onBackToMainClick = onBackToMainClick,
+                        onUploadAnotherAudioClick = onUploadAnotherAudioClick,
+                        onDeleteClick = {
+                            showDeleteDialog = true
                         }
-                    }
+                    )
                 }
 
                 else -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 48.dp)
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        Text(
-                            text = "Результат обработки",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        ResultTextCard(
-                            title = "Конспект",
-                            text = uiState.summary ?: "Конспект отсутствует"
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        ResultTextCard(
-                            title = "Расшифровка",
-                            text = uiState.transcript ?: "Расшифровка отсутствует"
-                        )
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        Button(
-                            onClick = onBackToMainClick,
-                            enabled = !uiState.isDeleting,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("На главный экран")
-                        }
-
-                        OutlinedButton(
-                            onClick = onUploadAnotherAudioClick,
-                            enabled = !uiState.isDeleting,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 12.dp)
-                        ) {
-                            Text("Загрузить другое аудио")
-                        }
-
-                        OutlinedButton(
-                            onClick = {
-                                showDeleteDialog = true
-                            },
-                            enabled = !uiState.isDeleting,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 12.dp)
-                        ) {
-                            Text(
-                                text = if (uiState.isDeleting) {
-                                    "Удаляем..."
-                                } else {
-                                    "Удалить конспект"
-                                }
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(80.dp))
-                    }
+                    ErrorState(
+                        message = "Данные результата отсутствуют",
+                        onBackToMainClick = onBackToMainClick,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
             }
 
             SettingsButton(
-                onClick = onSettingsClick,
+                onClick = {
+                    if (!uiState.isDeleting) {
+                        onSettingsClick()
+                    }
+                },
                 modifier = Modifier.align(Alignment.BottomEnd)
             )
         }
@@ -215,6 +151,128 @@ fun ResultScreen(
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun LoadingState(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator()
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Загрузка результата...",
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@Composable
+private fun ErrorState(
+    message: String,
+    onBackToMainClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Не удалось открыть результат",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            text = message,
+            color = MaterialTheme.colorScheme.error
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(onClick = onBackToMainClick) {
+            Text("На главный экран")
+        }
+    }
+}
+
+@Composable
+private fun ResultContent(
+    uiState: ResultUiState,
+    onBackToMainClick: () -> Unit,
+    onUploadAnotherAudioClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 48.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+        Text(
+            text = "Результат обработки",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        ResultTextCard(
+            title = "Конспект",
+            text = uiState.summary.orEmpty()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        ResultTextCard(
+            title = "Расшифровка",
+            text = uiState.transcript.orEmpty()
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = onBackToMainClick,
+            enabled = !uiState.isDeleting,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("На главный экран")
+        }
+
+        OutlinedButton(
+            onClick = onUploadAnotherAudioClick,
+            enabled = !uiState.isDeleting,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp)
+        ) {
+            Text("Загрузить другое аудио")
+        }
+
+        OutlinedButton(
+            onClick = onDeleteClick,
+            enabled = !uiState.isDeleting,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp)
+        ) {
+            if (uiState.isDeleting) {
+                CircularProgressIndicator()
+            } else {
+                Text("Удалить конспект")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(80.dp))
     }
 }
 

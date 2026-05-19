@@ -11,6 +11,8 @@ import com.example.lecture.data.network.safeApiCall
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.IOException
+import java.lang.SecurityException
 
 class AudioUploadRepository(
     private val contentResolver: ContentResolver,
@@ -23,23 +25,43 @@ class AudioUploadRepository(
         fileName: String,
         mimeType: String?
     ): NetworkResult<TaskDto> {
+        if (fileUri.isBlank()) {
+            return NetworkResult.Error(
+                message = "Не удалось получить путь к выбранному файлу"
+            )
+        }
+
+        if (fileName.isBlank()) {
+            return NetworkResult.Error(
+                message = "Не удалось получить имя выбранного файла"
+            )
+        }
+
         return try {
             val uri = Uri.parse(fileUri)
 
             val inputStream = contentResolver.openInputStream(uri)
-                ?: return NetworkResult.Error("Не удалось открыть выбранный файл")
+                ?: return NetworkResult.Error(
+                    message = "Не удалось открыть выбранный файл"
+                )
 
             val fileBytes = inputStream.use { stream ->
                 stream.readBytes()
             }
 
+            if (fileBytes.isEmpty()) {
+                return NetworkResult.Error(
+                    message = "Выбранный файл пустой"
+                )
+            }
+
             val requestBody = fileBytes.toRequestBody(
                 contentType = mimeType?.toMediaTypeOrNull()
-                    ?: "audio/*".toMediaTypeOrNull()
+                    ?: DEFAULT_AUDIO_MEDIA_TYPE.toMediaTypeOrNull()
             )
 
             val filePart = MultipartBody.Part.createFormData(
-                name = "file",
+                name = FILE_PART_NAME,
                 filename = fileName,
                 body = requestBody
             )
@@ -50,9 +72,17 @@ class AudioUploadRepository(
                     file = filePart
                 )
             }
+        } catch (exception: SecurityException) {
+            NetworkResult.Error(
+                message = "Нет доступа к выбранному файлу. Выберите файл еще раз"
+            )
+        } catch (exception: IOException) {
+            NetworkResult.Error(
+                message = "Не удалось прочитать выбранный файл"
+            )
         } catch (exception: Exception) {
             NetworkResult.Error(
-                message = "Не удалось подготовить файл к загрузке: ${exception.message}"
+                message = "Не удалось подготовить файл к загрузке"
             )
         }
     }
@@ -99,5 +129,10 @@ class AudioUploadRepository(
                 message = e.message ?: "Не удалось удалить задачу"
             )
         }
+    }
+
+    private companion object {
+        const val FILE_PART_NAME = "file"
+        const val DEFAULT_AUDIO_MEDIA_TYPE = "audio/*"
     }
 }

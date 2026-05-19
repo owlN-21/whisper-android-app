@@ -8,4 +8,7 @@ data class ResultUiState(
     val isDeleting: Boolean = false,
     val deleteErrorMessage: String? = null,
     val isDeleted: Boolean = false
-)
+) {
+    val hasResult: Boolean
+        get() = !summary.isNullOrBlank() && !transcript.isNullOrBlank()
+}
