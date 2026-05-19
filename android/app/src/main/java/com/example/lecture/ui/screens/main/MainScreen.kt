@@ -135,11 +135,11 @@ private fun MainContent(
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 80.dp),
+        contentPadding = PaddingValues(bottom = 96.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            HeaderBlock(email = uiState.email)
+            HeaderBlock()
         }
 
         item {
@@ -150,7 +150,7 @@ private fun MainContent(
 
         item {
             Text(
-                text = "Последние конспекты",
+                text = "История обработок",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold
             )
@@ -247,23 +247,12 @@ private fun ErrorState(
 }
 
 @Composable
-private fun HeaderBlock(
-    email: String
-) {
-    Column {
-        Text(
-            text = "Главный экран",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
-
-        Text(
-            text = email,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 4.dp)
-        )
-    }
+private fun HeaderBlock() {
+    Text(
+        text = "Мои конспекты",
+        style = MaterialTheme.typography.headlineMedium,
+        fontWeight = FontWeight.Bold
+    )
 }
 
 @Composable
@@ -281,7 +270,7 @@ private fun UploadAudioCard(
             modifier = Modifier.padding(24.dp)
         ) {
             Text(
-                text = "Загрузить новое аудио",
+                text = "Загрузить аудио",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -289,7 +278,7 @@ private fun UploadAudioCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Выберите аудиофайл, чтобы получить конспект",
+                text = "Выберите mp3, wav или m4a файл, чтобы получить конспект",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -331,7 +320,7 @@ private fun TaskCard(
     val summaryPreview = when {
         task.status == STATUS_FAILED -> task.errorMessage
             ?.takeIf { it.isNotBlank() }
-            ?: "Обработка завершилась с ошибкой"
+            ?: "Обработка аудио завершилась с ошибкой"
 
         task.summaryPreview.isNullOrBlank() -> getStatusDescription(task.status)
 
@@ -355,7 +344,7 @@ private fun TaskCard(
             )
 
             Text(
-                text = "Статус: ${getStatusText(task.status)}",
+                text = getStatusText(task.status),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp)
@@ -367,12 +356,14 @@ private fun TaskCard(
                 modifier = Modifier.padding(top = 8.dp)
             )
 
-            Text(
-                text = "Обновлено: ${formatDate(task.updatedAt)}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 8.dp)
-            )
+            if (task.status == STATUS_COMPLETED) {
+                Text(
+                    text = "Обновлено: ${formatDate(task.updatedAt)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
 
             if (task.status == STATUS_FAILED) {
                 TextButton(
@@ -388,11 +379,11 @@ private fun TaskCard(
 
 private fun getStatusText(status: String): String {
     return when (status) {
-        STATUS_COMPLETED -> "готово"
-        STATUS_TRANSCRIBING -> "распознавание аудио"
-        STATUS_SUMMARIZING -> "создание конспекта"
-        STATUS_FAILED -> "ошибка"
-        else -> status
+        STATUS_COMPLETED -> "Готово"
+        STATUS_TRANSCRIBING -> "Распознается"
+        STATUS_SUMMARIZING -> "Создается конспект"
+        STATUS_FAILED -> "Ошибка обработки"
+        else -> "В обработке"
     }
 }
 
@@ -401,7 +392,7 @@ private fun getStatusDescription(status: String): String {
         STATUS_COMPLETED -> "Конспект готов"
         STATUS_TRANSCRIBING -> "Аудио распознается"
         STATUS_SUMMARIZING -> "Конспект создается"
-        STATUS_FAILED -> "Обработка завершилась с ошибкой"
+        STATUS_FAILED -> "Обработка аудио завершилась с ошибкой"
         else -> "Задача еще обрабатывается"
     }
 }
@@ -420,9 +411,6 @@ private fun DeleteTaskDialog(
         },
         title = {
             Text(text = "Удалить эту задачу?")
-        },
-        text = {
-            Text(text = "Это действие нельзя будет отменить.")
         },
         confirmButton = {
             Button(
