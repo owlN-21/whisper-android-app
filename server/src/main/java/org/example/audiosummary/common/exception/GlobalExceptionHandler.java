@@ -1,9 +1,14 @@
 package org.example.audiosummary.common.exception;
 
+import java.time.LocalDateTime;
 import org.example.audiosummary.common.dto.error.ErrorResponse;
+import org.example.audiosummary.processing.exception.ProcessingServiceException;
+import org.example.audiosummary.processing.exception.ProcessingTaskFailedException;
+import org.example.audiosummary.summary.exception.SummaryNotFoundException;
 import org.example.audiosummary.task.exception.FileStorageException;
 import org.example.audiosummary.task.exception.InvalidAudioFileException;
 import org.example.audiosummary.task.exception.ProcessingTaskNotFoundException;
+import org.example.audiosummary.transcript.exception.TranscriptNotFoundException;
 import org.example.audiosummary.user.exception.UserAlreadyExistsException;
 import org.example.audiosummary.user.exception.UserHasTasksException;
 import org.example.audiosummary.user.exception.UserNotFoundException;
@@ -13,96 +18,111 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
-
-//400 - невалидный email
-//404 - пользователь не найден
-//409 - пользователь уже существует
-//409 - пользователя нельзя удалить, потому что есть связанные задачи
+// 400 - невалидный email
+// 404 - пользователь не найден
+// 409 - пользователь уже существует
+// 409 - пользователя нельзя удалить, потому что есть связанные задачи
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
-        ErrorResponse response = new ErrorResponse(
-                "USER_NOT_FOUND",
-                ex.getMessage(),
-                LocalDateTime.now()
-        );
+        ErrorResponse response =
+                new ErrorResponse("USER_NOT_FOUND", ex.getMessage(), LocalDateTime.now());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException ex) {
-        ErrorResponse response = new ErrorResponse(
-                "USER_ALREADY_EXISTS",
-                ex.getMessage(),
-                LocalDateTime.now()
-        );
+        ErrorResponse response =
+                new ErrorResponse("USER_ALREADY_EXISTS", ex.getMessage(), LocalDateTime.now());
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+      }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
+    String message =
+        ex.getBindingResult().getFieldErrors().stream()
+            .findFirst()
+            .map(error -> error.getDefaultMessage())
+            .orElse("Validation error");
+
+    ErrorResponse response = new ErrorResponse("VALIDATION_ERROR", message, LocalDateTime.now());
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+  }
+
+  @ExceptionHandler(UserHasTasksException.class)
+  public ResponseEntity<ErrorResponse> handleUserHasTasks(UserHasTasksException ex) {
+    ErrorResponse response =
+        new ErrorResponse("USER_HAS_TASKS", ex.getMessage(), LocalDateTime.now());
+
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+  }
+
+  @ExceptionHandler(ProcessingTaskNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleProcessingTaskNotFound(
+      ProcessingTaskNotFoundException ex) {
+    ErrorResponse response =
+        new ErrorResponse("PROCESSING_TASK_NOT_FOUND", ex.getMessage(), LocalDateTime.now());
+
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+  }
+
+  @ExceptionHandler(InvalidAudioFileException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidAudioFile(InvalidAudioFileException ex) {
+    ErrorResponse response =
+        new ErrorResponse("INVALID_AUDIO_FILE", ex.getMessage(), LocalDateTime.now());
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+  }
+
+  @ExceptionHandler(FileStorageException.class)
+  public ResponseEntity<ErrorResponse> handleFileStorage(FileStorageException ex) {
+    ErrorResponse response =
+        new ErrorResponse("FILE_STORAGE_ERROR", ex.getMessage(), LocalDateTime.now());
+
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+  }
+
+  @ExceptionHandler(SummaryNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleSummaryNotFound(SummaryNotFoundException ex) {
+        ErrorResponse response =
+                new ErrorResponse("SUMMARY_NOT_FOUND", ex.getMessage(), LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
-        String message = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .findFirst()
-                .map(error -> error.getDefaultMessage())
-                .orElse("Validation error");
-
-        ErrorResponse response = new ErrorResponse(
-                "VALIDATION_ERROR",
-                message,
-                LocalDateTime.now()
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-    }
-
-    @ExceptionHandler(UserHasTasksException.class)
-    public ResponseEntity<ErrorResponse> handleUserHasTasks(UserHasTasksException ex) {
-        ErrorResponse response = new ErrorResponse(
-                "USER_HAS_TASKS",
-                ex.getMessage(),
-                LocalDateTime.now()
-        );
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-    }
-
-    @ExceptionHandler(ProcessingTaskNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleProcessingTaskNotFound(ProcessingTaskNotFoundException ex) {
-        ErrorResponse response = new ErrorResponse(
-                "PROCESSING_TASK_NOT_FOUND",
-                ex.getMessage(),
-                LocalDateTime.now()
-        );
+    @ExceptionHandler(TranscriptNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleTranscriptNotFound(TranscriptNotFoundException ex) {
+        ErrorResponse response =
+                new ErrorResponse("TRANSCRIPT_NOT_FOUND", ex.getMessage(), LocalDateTime.now());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
-    @ExceptionHandler(InvalidAudioFileException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidAudioFile(InvalidAudioFileException ex) {
-        ErrorResponse response = new ErrorResponse(
-                "INVALID_AUDIO_FILE",
-                ex.getMessage(),
-                LocalDateTime.now()
-        );
+    @ExceptionHandler(ProcessingServiceException.class)
+    public ResponseEntity<ErrorResponse> handleProcessingService(ProcessingServiceException ex) {
+        ErrorResponse response =
+                new ErrorResponse("PROCESSING_SERVICE_ERROR", ex.getMessage(), LocalDateTime.now());
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(response);
     }
 
-    @ExceptionHandler(FileStorageException.class)
-    public ResponseEntity<ErrorResponse> handleFileStorage(FileStorageException ex) {
-        ErrorResponse response = new ErrorResponse(
-                "FILE_STORAGE_ERROR",
-                ex.getMessage(),
-                LocalDateTime.now()
-        );
+    @ExceptionHandler(ProcessingTaskFailedException.class)
+    public ResponseEntity<ErrorResponse> handleProcessingTaskFailed(ProcessingTaskFailedException ex) {
+        ErrorResponse response =
+                new ErrorResponse("PROCESSING_TASK_FAILED", ex.getMessage(), LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleUnexpected(Exception ex) {
+        ErrorResponse response =
+                new ErrorResponse("INTERNAL_SERVER_ERROR", "Unexpected server error", LocalDateTime.now());
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }

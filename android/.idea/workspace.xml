@@ -9,11 +9,8 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7a735bea-b23c-47ff-8278-d0b92e1ed78b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../WhisperCPP/whisper.cpp/examples/whisper.android/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../WhisperCPP/whisper.cpp/examples/whisper.android/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../WhisperCPP/whisper.cpp/examples/whisper.android/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../WhisperCPP/whisper.cpp/examples/whisper.android/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../WhisperCPP/whisper.cpp/examples/whisper.android/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../WhisperCPP/whisper.cpp/examples/whisper.android/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../WhisperCPP/whisper.cpp/examples/whisper.android/app/src/main/java/com/whispercppdemo/ui/main/MainScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../../WhisperCPP/whisper.cpp/examples/whisper.android/app/src/main/java/com/whispercppdemo/ui/main/MainScreen.kt" afterDir="false" />
+    <list default="true" id="a96017e6-fb31-4c55-9b06-25f4602664ce" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,7 +34,7 @@
             <expand>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="WhisperCppDemo" type="f1a62948:ProjectNode" />
+                <item name="lecture" type="f1a62948:ProjectNode" />
               </path>
             </expand>
             <select />
@@ -49,18 +46,20 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Class" />
         <option value="Kotlin Class" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
-    <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
+  <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="C:\Users\Nastya\.gradle\wrapper\dists\gradle-8.13-bin\5xuhj0ry160q40clulazy9h7d\gradle-8.13" javaHome="C:\Program Files\Android\Android Studio\jbr" gradleVersion="8.13" />
   <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 2
 }</component>
-  <component name="ProjectId" id="39O8kHBko2fd4SIEBm5Ij2y5AbO" />
+  <component name="ProjectId" id="3DfCK4IqszlscrkpBDj04B59I0b" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -68,36 +67,29 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Android App.app.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "audio-summary-server",
-    "last_opened_file_path": "D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.17",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle"
+    "com.google.services.firebase.aqiPopupShown": "true",
+    "git-widget-placeholder": "android-client",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true"
   }
 }]]></component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\diplom\WhisperCPP\whisper.cpp\examples\whisper.android\app\src\main\assets\samples" />
-      <recent name="D:\diplom\WhisperCPP\whisper.cpp\examples\whisper.android\app\src\main\assets\models" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\diplom\WhisperAndroid\MyWhisperAndroidApp\android\app\src\main\assets\models" />
-      <recent name="D:\diplom\WhisperCPP\whisper.cpp\examples\whisper.android\app\src\main\assets\samples" />
-      <recent name="D:\diplom\WhisperCPP\whisper.cpp\examples\whisper.android\app" />
+    <key name="K2MoveDeclarationsDialog.RECENT_PACKAGE_KEY">
+      <recent name="com.example.lecture.data.local.db.dao" />
+      <recent name="com.example.lecture.ui.components" />
     </key>
   </component>
   <component name="RunManager">
     <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
-      <module name="WhisperCppDemo.app" />
+      <module name="lecture.app" />
       <option name="ANDROID_RUN_CONFIGURATION_SCHEMA_VERSION" value="1" />
       <option name="DEPLOY" value="true" />
       <option name="DEPLOY_APK_FROM_BUNDLE" value="false" />
@@ -168,33 +160,37 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="7a735bea-b23c-47ff-8278-d0b92e1ed78b" name="Changes" comment="" />
-      <created>1770555897888</created>
+      <changelist id="a96017e6-fb31-4c55-9b06-25f4602664ce" name="Changes" comment="" />
+      <created>1778663670524</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1770555897888</updated>
+      <updated>1778663670524</updated>
     </task>
     <servers />
   </component>
   <component name="play_dynamic_filters_status">
     <option name="appIdToCheckInfo">
       <map>
-        <entry key="com.whispercpp.test">
+        <entry key="com.example.lecture">
           <value>
-            <CheckInfo lastCheckTimestamp="1771319764663" />
+            <CheckInfo lastCheckTimestamp="1778682250428" />
           </value>
         </entry>
-        <entry key="com.whispercppdemo">
+        <entry key="com.example.lecture.test">
           <value>
-            <CheckInfo lastCheckTimestamp="1773500965316" />
-          </value>
-        </entry>
-        <entry key="com.whispercppdemo.test">
-          <value>
-            <CheckInfo lastCheckTimestamp="1773500965316" />
+            <CheckInfo lastCheckTimestamp="1778682250428" />
           </value>
         </entry>
       </map>

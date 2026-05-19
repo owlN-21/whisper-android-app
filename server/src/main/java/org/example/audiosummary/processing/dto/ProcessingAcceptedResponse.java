@@ -1,7 +1,5 @@
 package org.example.audiosummary.processing.dto;
 
-public record ProcessingAcceptedResponse(
-        Long taskId,
-        String status
-) {
-}
+import org.example.audiosummary.processing.dto.status.ProcessingStatus;
+
+public record ProcessingAcceptedResponse(Long taskId, ProcessingStatus status) {}

@@ -236,14 +236,14 @@ select id, email, created_at, updated_at from users;
 Создание задачи с загрузкой аудиофайла:
 
 ```http
-POST http://localhost:8080/api/users/1/tasks
+POST http://localhost:8080/api/v1/users/1/tasks
 Content-Type: multipart/form-data
 ```
 
 В Postman:
 
 * выбрать `POST`
-* указать URL `http://localhost:8080/api/users/1/tasks`
+* указать URL `http://localhost:8080/api/v1/users/1/tasks`
 * открыть вкладку `Body`
 * выбрать `form-data`
 * добавить поле:
@@ -260,33 +260,34 @@ Content-Type: multipart/form-data
 Получение задачи по id:
 
 ```http
-GET http://localhost:8080/api/tasks/1
+GET http://localhost:8080/api/v1/tasks/1
 ```
 
 Получение списка задач пользователя:
 
 ```http
-GET http://localhost:8080/api/users/1/tasks
+GET http://localhost:8080/api/v1/users/1/tasks
 ```
 
 Удаление задачи:
 
 ```http
-DELETE http://localhost:8080/api/tasks/1
+DELETE http://localhost:8080/api/v1/tasks/1
 ```
 
-После успешного `POST /api/users/{userId}/tasks`:
+После успешного `POST /api/v1/users/{userId}/tasks`:
 
 * файл должен сохраниться в локальное хранилище
 * запись должна появиться в таблице `processing_tasks`
-* задача должна получить статус `UPLOADED`
+* задача должна получить статус TRANSCRIBING, если аудио успешно отправилось в processing-service.
+  Если processing-service недоступен или произошла ошибка, задача может получить статус FAILED.
 
 # В таблице processing_tasks:
 
 `original_filename` — исходное имя файла
 `storage_path` — путь к сохраненному файлу
 
-После успешного `DELETE /api/tasks/{taskId}`:
+После успешного `DELETE /api/v1/tasks/{taskId}`:
 
 * файл должен быть удален из хранилища
 * запись должна быть удалена из таблицы `processing_tasks`
@@ -326,26 +327,26 @@ select id, user_id, original_filename, storage_path, status, error_message, crea
 Создание задачи с загрузкой аудиофайла:
 
 ```http
-POST http://localhost:8080/api/users/1/tasks
+POST http://localhost:8080/api/v1/users/1/tasks
 Content-Type: multipart/form-data
 ```
 
 Получение задачи по id:
 
 ```http
-GET http://localhost:8080/api/tasks/1
+GET http://localhost:8080/api/v1/tasks/1
 ```
 
 Получение списка задач пользователя:
 
 ```http
-GET http://localhost:8080/api/users/1/tasks
+GET http://localhost:8080/api/v1/users/1/tasks
 ```
 
 Удаление задачи:
 
 ```http
-DELETE http://localhost:8080/api/tasks/1
+DELETE http://localhost:8080/api/v1/tasks/1
 ```
 ### Если при загрузке файла приходит 413 Request Entity Too Large (Размер указан в application.yml)
 
@@ -363,19 +364,19 @@ DELETE http://localhost:8080/api/tasks/1
     * `POST http://localhost:8080/api/v1/users`
 5. Загрузить аудиофайл:
 
-    * `POST http://localhost:8080/api/users/{userId}/tasks`
+    * `POST http://localhost:8080/api/v1/users/{userId}/tasks`
 6. Проверить задачу по id:
 
-    * `GET http://localhost:8080/api/tasks/{taskId}`
+    * `GET http://localhost:8080/api/v1/tasks/{taskId}`
 7. Проверить список задач пользователя:
 
-    * `GET http://localhost:8080/api/users/{userId}/tasks`
+    * `GET http://localhost:8080/api/v1/users/{userId}/tasks`
 8. Проверить данные в PostgreSQL:
 
     * `select * from processing_tasks;`
 9. Удалить задачу:
 
-    * `DELETE http://localhost:8080/api/tasks/{taskId}`
+    * `DELETE http://localhost:8080/api/v1/tasks/{taskId}`
 10. Повторно проверить таблицу:
 
     * `select * from processing_tasks;`
@@ -409,7 +410,7 @@ Content-Type: application/json
 4. Загрузить аудиофайл:
 
 ```http
-POST http://localhost:8080/api/users/{userId}/tasks
+POST http://localhost:8080/api/v1/users/{userId}/tasks
 Content-Type: multipart/form-data
 ```
 
@@ -424,7 +425,7 @@ Content-Type: multipart/form-data
 5. Проверить, что задача сохранилась:
 
 ```http
-GET http://localhost:8080/api/users/{userId}/tasks
+GET http://localhost:8080/api/v1/users/{userId}/tasks
 ```
 
 6. Подключиться к PostgreSQL внутри Docker:
@@ -451,17 +452,26 @@ select * from summaries;
 select id, task_id, content, created_at from summaries;
 ```
 
-После успешного `POST /api/users/{userId}/tasks`:
+После успешного POST /api/v1/users/{userId}/tasks:
 
-* запись должна появиться в таблице `processing_tasks`
-* запись должна появиться в таблице `summaries`
-* `summaries.task_id` должен ссылаться на созданную задачу
-* в поле `content` должен сохраниться текст заглушки
+* запись должна появиться в таблице processing_tasks
+* задача должна перейти в статус TRANSCRIBING
+
+Чтобы transcript и summary сохранились в БД, нужно дергать:
+
+GET /api/v1/tasks/{taskId}
+
+После завершения обработки:
+
+* запись должна появиться в таблице transcripts
+* запись должна появиться в таблице summaries
+* summaries.task_id должен ссылаться на созданную задачу
+* в поле content должен сохраниться текст summary, полученный от processing-service
 
 10. Удалить задачу:
 
 ```http
-DELETE http://localhost:8080/api/tasks/{taskId}
+DELETE http://localhost:8080/api/v1/tasks/{taskId}
 ```
 
 11. Повторно проверить таблицы:
@@ -471,8 +481,73 @@ select * from processing_tasks;
 select * from summaries;
 ```
 
-После успешного `DELETE /api/tasks/{taskId}`:
+После успешного `DELETE /api/v1/tasks/{taskId}`:
 
 * запись должна быть удалена из таблицы `processing_tasks`
 * связанная запись в таблице `summaries` должна удалиться автоматически
 
+### Проверка обработки аудио через main backend
+
+1. Создать пользователя
+
+POST `http://localhost:8080/api/v1/users`
+
+Body → raw → JSON:
+
+```json
+{
+  "email": "test@example.com"
+}
+```
+
+2. Загрузить аудио
+
+POST `http://localhost:8080/api/v1/users/{userId}/tasks`
+
+Body → form-data:
+
+key: `file`
+type: `File`
+value: выбрать `.mp3`, `.wav` или `.m4a`
+
+Важно: `taskId` и `model` сюда не передавать.
+
+3. Проверить статус задачи
+
+GET `http://localhost:8080/api/v1/tasks/{taskId}`
+
+Повторять запрос, пока статус не станет `COMPLETED`.
+
+Статусы:
+
+`TRANSCRIBING` → идет транскрибация
+`SUMMARIZING` → идет суммаризация
+`COMPLETED` → результат готов
+`FAILED` → ошибка, смотреть `errorMessage`
+
+#### Чтобы transcript и summary подтянулись и сохранились в БД, нужно дергать GET /api/v1/tasks/{taskId}.
+4. Получить transcript
+
+GET `http://localhost:8080/api/v1/tasks/{taskId}/transcript`
+
+Этот endpoint возвращает распознанный текст аудиофайла, который main backend получил от processing-service и сохранил в таблицу `transcripts`.
+
+Пример ответа:
+
+{
+"taskId": 26,
+"status": "COMPLETED",
+"transcript": "Распознанный текст..."
+}
+
+Важно: transcript можно получить только после того, как он уже был сохранен в БД. Для этого нужно дергать `GET /api/v1/tasks/{taskId}`, пока обработка не продвинется дальше транскрибации.
+
+5. Получить summary
+
+GET `http://localhost:8080/api/v1/tasks/{taskId}/result`
+
+6. Удалить задачу
+
+DELETE `http://localhost:8080/api/v1/tasks/{taskId}`
+
+Коротко по логике: после `POST /api/v1/users/{userId}/tasks` задача только запускается. Чтобы transcript и summary подтянулись и сохранились в БД, нужно дергать `GET /api/v1/tasks/{taskId}`.
