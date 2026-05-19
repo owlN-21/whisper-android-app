@@ -1,3 +1,0 @@
-D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/armeabi-v7a/_deps/ggml-subbuild/CMakeFiles/ggml-populate.dir
-D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/armeabi-v7a/_deps/ggml-subbuild/CMakeFiles/edit_cache.dir
-D:/diplom/WhisperAndroid/MyWhisperAndroidApp/android/lib/.cxx/RelWithDebInfo/2s4s5326/armeabi-v7a/_deps/ggml-subbuild/CMakeFiles/rebuild_cache.dir

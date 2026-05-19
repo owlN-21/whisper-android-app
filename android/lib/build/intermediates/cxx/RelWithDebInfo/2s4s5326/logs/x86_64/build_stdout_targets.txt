@@ -1,2 +1,0 @@
-ninja: Entering directory `D:\diplom\WhisperAndroid\MyWhisperAndroidApp\android\lib\.cxx\RelWithDebInfo\2s4s5326\x86_64'
-ninja: no work to do.
