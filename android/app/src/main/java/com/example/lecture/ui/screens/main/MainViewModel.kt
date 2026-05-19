@@ -11,6 +11,7 @@ import com.example.lecture.data.local.db.entity.SummaryEntity
 import com.example.lecture.data.local.db.entity.TaskEntity
 import com.example.lecture.data.local.db.entity.TranscriptEntity
 import com.example.lecture.data.network.NetworkResult
+import com.example.lecture.data.network.dto.TaskDto
 import com.example.lecture.data.repository.AudioUploadRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -48,6 +49,127 @@ class MainViewModel(
 
     fun refresh() {
         loadData()
+    }
+
+    fun requestDeleteTask(taskId: Long) {
+        _uiState.update {
+            it.copy(
+                taskIdPendingDeletion = taskId,
+                deleteErrorMessage = null
+            )
+        }
+    }
+
+    fun cancelDeleteTask() {
+        _uiState.update {
+            it.copy(
+                taskIdPendingDeletion = null,
+                deleteErrorMessage = null
+            )
+        }
+    }
+
+    fun clearDeleteError() {
+        _uiState.update {
+            it.copy(deleteErrorMessage = null)
+        }
+    }
+
+    fun confirmDeleteTask() {
+        val taskId = _uiState.value.taskIdPendingDeletion ?: return
+
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isDeletingTask = true,
+                    deleteErrorMessage = null
+                )
+            }
+
+            try {
+                val task = taskDao.getTaskById(taskId)
+
+                if (task == null) {
+                    _uiState.update {
+                        it.copy(
+                            isDeletingTask = false,
+                            taskIdPendingDeletion = null
+                        )
+                    }
+                    return@launch
+                }
+
+                val remoteTaskId = task.remoteTaskId
+
+                if (remoteTaskId == null) {
+                    deleteTaskLocally(taskId)
+
+                    _uiState.update {
+                        it.copy(
+                            isDeletingTask = false,
+                            taskIdPendingDeletion = null
+                        )
+                    }
+
+                    return@launch
+                }
+
+                when (val result = audioUploadRepository.deleteTask(remoteTaskId)) {
+                    is NetworkResult.Success -> {
+                        deleteTaskLocally(taskId)
+
+                        _uiState.update {
+                            it.copy(
+                                isDeletingTask = false,
+                                taskIdPendingDeletion = null
+                            )
+                        }
+                    }
+
+                    is NetworkResult.Error -> {
+                        if (isTaskAlreadyDeletedOnBackend(result)) {
+                            deleteTaskLocally(taskId)
+
+                            _uiState.update {
+                                it.copy(
+                                    isDeletingTask = false,
+                                    taskIdPendingDeletion = null
+                                )
+                            }
+                        } else {
+                            _uiState.update {
+                                it.copy(
+                                    isDeletingTask = false,
+                                    deleteErrorMessage = result.message
+                                )
+                            }
+                        }
+                    }
+                }
+            } catch (exception: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isDeletingTask = false,
+                        deleteErrorMessage = exception.message
+                            ?: "Не удалось удалить задачу"
+                    )
+                }
+            }
+        }
+    }
+
+    private suspend fun deleteTaskLocally(taskId: Long) {
+        summaryDao.deleteSummaryByTaskId(taskId)
+        transcriptDao.deleteTranscriptByTaskId(taskId)
+        taskDao.deleteTaskById(taskId)
+    }
+
+    private fun isTaskAlreadyDeletedOnBackend(
+        result: NetworkResult.Error
+    ): Boolean {
+        return result.code == 404 ||
+                result.message.contains("PROCESSING_TASK_NOT_FOUND", ignoreCase = true) ||
+                result.message.contains("404", ignoreCase = true)
     }
 
     override fun onCleared() {
@@ -102,8 +224,11 @@ class MainViewModel(
                     )
                 }
 
+                syncTasksFromBackend(userId)
+
                 observeTasks(userId)
                 startUnfinishedTasksPolling()
+
             } catch (exception: Exception) {
                 _uiState.update {
                     it.copy(
@@ -116,6 +241,110 @@ class MainViewModel(
                 }
             }
         }
+    }
+
+    private suspend fun syncTasksFromBackend(userId: Long) {
+        when (val result = audioUploadRepository.getUserTasks(userId)) {
+            is NetworkResult.Success -> {
+                result.data.forEach { taskDto ->
+                    saveOrUpdateBackendTask(
+                        userId = userId,
+                        taskDto = taskDto
+                    )
+                }
+            }
+
+            is NetworkResult.Error -> {
+                _uiState.update {
+                    it.copy(
+                        errorMessage = result.message
+                    )
+                }
+            }
+        }
+    }
+
+    private suspend fun saveOrUpdateBackendTask(
+        userId: Long,
+        taskDto: TaskDto
+    ) {
+        val remoteTaskId = taskDto.id
+
+        val fileName = taskDto.fileName
+            ?.takeIf { it.isNotBlank() }
+            ?: "audio_${remoteTaskId}"
+
+        val status = taskDto.status.takeIf { it.isNotBlank() }
+            ?: STATUS_UPLOADED
+
+        val localTask = taskDao.getTaskByRemoteTaskId(
+            userId = userId,
+            remoteTaskId = remoteTaskId
+        )
+
+        val localTaskId = if (localTask == null) {
+            taskDao.insertTask(
+                TaskEntity(
+                    remoteTaskId = remoteTaskId,
+                    userId = userId,
+                    originalFileName = fileName,
+                    localFileUri = null,
+                    status = status
+                )
+            )
+        } else {
+            taskDao.updateTaskFromBackend(
+                taskId = localTask.id,
+                originalFileName = fileName,
+                status = status
+            )
+
+            localTask.id
+        }
+
+        when (status) {
+            STATUS_COMPLETED -> {
+                loadCompletedResultIfNeeded(
+                    localTaskId = localTaskId,
+                    remoteTaskId = remoteTaskId
+                )
+            }
+
+            STATUS_FAILED -> {
+                taskDao.updateTaskError(
+                    taskId = localTaskId,
+                    errorMessage = "Обработка аудио завершилась с ошибкой",
+                    status = STATUS_FAILED
+                )
+            }
+        }
+    }
+
+    private suspend fun loadCompletedResultIfNeeded(
+        localTaskId: Long,
+        remoteTaskId: Long
+    ) {
+        val localSummary = summaryDao.getSummaryByTaskId(localTaskId)
+        val localTranscript = transcriptDao.getTranscriptByTaskId(localTaskId)
+
+        if (localSummary != null && localTranscript != null) {
+            taskDao.updateTaskStatus(
+                taskId = localTaskId,
+                status = STATUS_COMPLETED
+            )
+
+            taskDao.updateSummaryPreview(
+                taskId = localTaskId,
+                summaryPreview = createSummaryPreview(localSummary.content)
+            )
+
+            return
+        }
+
+        loadCompletedResult(
+            localTaskId = localTaskId,
+            remoteTaskId = remoteTaskId
+        )
     }
 
     private fun observeTasks(userId: Long) {

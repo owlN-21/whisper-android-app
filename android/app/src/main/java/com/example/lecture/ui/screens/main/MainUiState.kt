@@ -7,5 +7,9 @@ data class MainUiState(
     val isLoading: Boolean = true,
     val tasks: List<TaskEntity> = emptyList(),
     val errorMessage: String? = null,
-    val isEmpty: Boolean = true
+    val isEmpty: Boolean = true,
+
+    val taskIdPendingDeletion: Long? = null,
+    val isDeletingTask: Boolean = false,
+    val deleteErrorMessage: String? = null
 )

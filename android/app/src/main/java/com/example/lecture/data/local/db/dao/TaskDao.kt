@@ -47,6 +47,35 @@ interface TaskDao {
 
     @Query(
         """
+        SELECT * FROM tasks
+        WHERE userId = :userId
+        AND remoteTaskId = :remoteTaskId
+        LIMIT 1
+        """
+    )
+    suspend fun getTaskByRemoteTaskId(
+        userId: Long,
+        remoteTaskId: Long
+    ): TaskEntity?
+
+    @Query(
+        """
+        UPDATE tasks
+        SET originalFileName = :originalFileName,
+            status = :status,
+            updatedAt = :updatedAt
+        WHERE id = :taskId
+        """
+    )
+    suspend fun updateTaskFromBackend(
+        taskId: Long,
+        originalFileName: String,
+        status: String,
+        updatedAt: Long = System.currentTimeMillis()
+    )
+
+    @Query(
+        """
         UPDATE tasks
         SET errorMessage = :errorMessage,
             status = :status,

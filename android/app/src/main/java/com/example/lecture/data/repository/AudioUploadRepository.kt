@@ -87,6 +87,14 @@ class AudioUploadRepository(
         }
     }
 
+    suspend fun getUserTasks(
+        userId: Long
+    ): NetworkResult<List<TaskDto>> {
+        return safeApiCall {
+            apiService.getUserTasks(userId)
+        }
+    }
+
     suspend fun getTaskStatus(
         taskId: Long
     ): NetworkResult<TaskDto> {
@@ -121,7 +129,8 @@ class AudioUploadRepository(
                 val errorBody = response.errorBody()?.string()
 
                 NetworkResult.Error(
-                    message = errorBody ?: "Ошибка удаления задачи: ${response.code()}"
+                    message = errorBody ?: "Ошибка удаления задачи: ${response.code()}",
+                    code = response.code()
                 )
             }
         } catch (e: Exception) {

@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -18,7 +20,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -42,10 +46,23 @@ fun MainScreen(
     uiState: MainUiState,
     onUploadClick: () -> Unit,
     onTaskClick: (Long) -> Unit,
-    onSettingsClick: () -> Unit
+    onSettingsClick: () -> Unit,
+    onDeleteFailedTaskClick: (Long) -> Unit,
+    onCancelDeleteTask: () -> Unit,
+    onConfirmDeleteTask: () -> Unit,
+    onDeleteErrorShown: () -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(uiState.deleteErrorMessage) {
+        val message = uiState.deleteErrorMessage
+
+        if (!message.isNullOrBlank()) {
+            snackbarHostState.showSnackbar(message = message)
+            onDeleteErrorShown()
+        }
+    }
 
     Scaffold(
         snackbarHost = {
@@ -82,6 +99,7 @@ fun MainScreen(
                         uiState = uiState,
                         onUploadClick = onUploadClick,
                         onTaskClick = onTaskClick,
+                        onDeleteFailedTaskClick = onDeleteFailedTaskClick,
                         onShowMessage = { message ->
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(message = message)
@@ -89,6 +107,14 @@ fun MainScreen(
                         }
                     )
                 }
+            }
+
+            if (uiState.taskIdPendingDeletion != null) {
+                DeleteTaskDialog(
+                    isDeleting = uiState.isDeletingTask,
+                    onDismiss = onCancelDeleteTask,
+                    onConfirm = onConfirmDeleteTask
+                )
             }
 
             SettingsButton(
@@ -104,6 +130,7 @@ private fun MainContent(
     uiState: MainUiState,
     onUploadClick: () -> Unit,
     onTaskClick: (Long) -> Unit,
+    onDeleteFailedTaskClick: (Long) -> Unit,
     onShowMessage: (String) -> Unit
 ) {
     LazyColumn(
@@ -145,6 +172,9 @@ private fun MainContent(
                             onTaskClick = onTaskClick,
                             onShowMessage = onShowMessage
                         )
+                    },
+                    onDeleteClick = {
+                        onDeleteFailedTaskClick(task.id)
                     }
                 )
             }
@@ -295,7 +325,8 @@ private fun EmptyTasksBlock() {
 @Composable
 private fun TaskCard(
     task: TaskEntity,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onDeleteClick: () -> Unit
 ) {
     val summaryPreview = when {
         task.status == STATUS_FAILED -> task.errorMessage
@@ -342,6 +373,15 @@ private fun TaskCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 8.dp)
             )
+
+            if (task.status == STATUS_FAILED) {
+                TextButton(
+                    onClick = onDeleteClick,
+                    modifier = Modifier.padding(top = 8.dp)
+                ) {
+                    Text(text = "Удалить")
+                }
+            }
         }
     }
 }
@@ -364,6 +404,49 @@ private fun getStatusDescription(status: String): String {
         STATUS_FAILED -> "Обработка завершилась с ошибкой"
         else -> "Задача еще обрабатывается"
     }
+}
+
+@Composable
+private fun DeleteTaskDialog(
+    isDeleting: Boolean,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = {
+            if (!isDeleting) {
+                onDismiss()
+            }
+        },
+        title = {
+            Text(text = "Удалить эту задачу?")
+        },
+        text = {
+            Text(text = "Это действие нельзя будет отменить.")
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                enabled = !isDeleting
+            ) {
+                Text(
+                    text = if (isDeleting) {
+                        "Удаление..."
+                    } else {
+                        "Удалить"
+                    }
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss,
+                enabled = !isDeleting
+            ) {
+                Text(text = "Отмена")
+            }
+        }
+    )
 }
 
 private fun formatDate(timestamp: Long): String {

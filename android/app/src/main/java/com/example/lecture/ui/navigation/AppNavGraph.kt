@@ -136,7 +136,11 @@ fun AppNavGraph() {
                 },
                 onSettingsClick = {
                     navController.navigate(Screen.Settings.route)
-                }
+                },
+                onDeleteFailedTaskClick = mainViewModel::requestDeleteTask,
+                onCancelDeleteTask = mainViewModel::cancelDeleteTask,
+                onConfirmDeleteTask = mainViewModel::confirmDeleteTask,
+                onDeleteErrorShown = mainViewModel::clearDeleteError
             )
         }
 
